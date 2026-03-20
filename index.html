@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
 .app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;}
-.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px;scrollbar-width:none;}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px;scrollbar-width:none;width:100%;}
 .screen::-webkit-scrollbar{display:none;}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(15,15,15,0.96);backdrop-filter:blur(20px);border-top:0.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;border:none;background:none;color:var(--text3);cursor:pointer;transition:color 0.15s;font-family:'DM Sans',sans-serif;}
@@ -71,12 +71,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .add-set-bar .save-btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
 .ex-picker{margin:0 16px 14px;}
 .ex-picker select{width:100%;padding:12px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
-.cal-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:12px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:0 10px;margin-bottom:12px;}
 .cal-month{font-size:18px;font-weight:600;}
 .cal-nav{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--radius-sm);width:34px;height:34px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 16px;margin-bottom:16px;}
-.cal-day-header{font-size:11px;color:var(--text2);text-align:center;padding:4px 0;font-weight:500;}
-.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;cursor:pointer;position:relative;transition:background 0.1s;color:var(--text2);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:0 8px;margin-bottom:16px;box-sizing:border-box;width:100%;}
+.cal-day-header{font-size:10px;color:var(--text2);text-align:center;padding:4px 0;font-weight:500;min-width:0;overflow:hidden;}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;cursor:pointer;position:relative;transition:background 0.1s;color:var(--text2);min-width:0;}
 .cal-day.has-workout{color:var(--text);font-weight:600;}
 .cal-day.has-workout::after{content:'';position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:var(--green);}
 .cal-day.selected{background:var(--green);color:#000;font-weight:600;}
@@ -574,7 +574,7 @@ function renderCalendar(){
   document.getElementById('screen').innerHTML=`
     <div class="page-header fade-in"><h1>Calendar</h1><p>Browse your workouts</p></div>
     <div class="cal-header fade-in"><button class="cal-nav" onclick="changeMonth(-1)">‹</button><div class="cal-month">${monthName}</div><button class="cal-nav" onclick="changeMonth(1)">›</button></div>
-    <div class="cal-grid fade-in">${['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=>`<div class="cal-day-header">${d}</div>`).join('')}${dc}</div>
+    <div class="cal-grid fade-in">${['M','T','W','T','F','S','S'].map(d=>`<div class="cal-day-header">${d}</div>`).join('')}${dc}</div>
     <div class="section-label">${calSelected===today?'Today':fmtDate(calSelected)}</div>
     ${!hasWorkout?`<div class="card fade-in"><div class="add-workout-cta"><p>No workout logged for this day</p><button class="btn-cta" onclick="navigate('log','${calSelected}')">+ Log Workout for This Day</button></div></div>`:`
     <div class="card fade-in" style="padding:12px 16px;margin-bottom:10px;">
