@@ -421,8 +421,12 @@ async function loadProfileCloud(){
     avatar:data.avatar||''
   };
 }
-async function saveProfileCloud(p){
-  await _sb.from('profile').upsert({
+// ─── Local save stubs (now delegate to cloud) ─────────────────────────────────
+function saveSets(s){/* sets array is source of truth; individual ops call cloud directly */}
+function saveExercises(e){saveExercisesCloud(e);}
+async function saveProfile(p){
+  profile=p;
+  const{error}=await _sb.from('profile').upsert({
     user_id:_currentUser.id,
     name:p.name||null,
     age:p.age||null,
@@ -432,12 +436,8 @@ async function saveProfileCloud(p){
     avatar:p.avatar||null,
     updated_at:new Date().toISOString()
   },{onConflict:'user_id'});
+  if(error){console.error('Profile save error:',error);toast('Error saving profile','#ef4444');}
 }
-
-// ─── Local save stubs (now delegate to cloud) ─────────────────────────────────
-function saveSets(s){/* sets array is source of truth; individual ops call cloud directly */}
-function saveExercises(e){saveExercisesCloud(e);}
-function saveProfile(p){profile=p;saveProfileCloud(p);}
 
 // ─── One-time migration from localStorage ─────────────────────────────────────
 async function migrateLocalStorageIfNeeded(){
@@ -950,7 +950,7 @@ function renderProfile(){
   if(p.weight&&p.height)calcBMI();
 }
 
-function saveProfileData(){
+async function saveProfileData(){
   profile={
     ...profile,
     name:document.getElementById('pName').value.trim(),
@@ -958,7 +958,9 @@ function saveProfileData(){
     weight:document.getElementById('pWeight').value,
     height:document.getElementById('pHeight').value
   };
-  saveProfile(profile);toast('Profile saved');renderProfile();
+  await saveProfile(profile);
+  toast('Profile saved ✓');
+  renderProfile();
 }
 
 // BMI
@@ -989,9 +991,9 @@ function uploadAvatar(event){
   const file=event.target.files[0];if(!file)return;
   if(file.size>2*1024*1024){toast('Image too large (max 2MB)','#ef4444');return;}
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     profile.avatar=e.target.result;
-    saveProfile(profile);
+    await saveProfile(profile);
     renderProfile();
     toast('Profile picture updated');
   };
