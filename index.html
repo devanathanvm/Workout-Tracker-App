@@ -371,10 +371,14 @@ async function handleSignup(){
 
 async function handleLogout(){
   await _sb.auth.signOut();
-  sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};
+  sets=[];
+  exercises=[];
+  profile={name:'',age:'',weight:'',height:''};
+  _currentUser=null;
   document.getElementById('loginScreen').style.display='block';
   document.querySelector('.app').style.display='none';
   showLogin();
+  toast('Signed out successfully');
 }
 
 // ─── Cloud Storage ────────────────────────────────────────────────────────────
@@ -393,7 +397,7 @@ async function deleteSetCloud(id){
 async function loadExercisesCloud(){
   const{data,error}=await _sb.from('exercises').select('*').eq('user_id',_currentUser.id);
   if(error||!data||data.length===0)return null;
-  return data.map(r=>({name:r.name,cat:r.cat}));
+  return data.map(r=>({id:r.id,name:r.name,cat:r.cat}));
 }
 async function saveExercisesCloud(exList){
   // Upsert all exercises for this user
@@ -407,11 +411,27 @@ async function saveOneExerciseCloud(ex){
 
 async function loadProfileCloud(){
   const{data,error}=await _sb.from('profile').select('*').eq('user_id',_currentUser.id).maybeSingle();
-  if(error||!data)return{name:'',age:'',weight:'',height:''};
-  return{name:data.name||'',age:data.age||'',weight:data.bodyweight||'',height:data.height||'',gender:data.gender||'male',avatar:data.avatar||''};
+  if(error||!data)return{name:'',age:'',weight:'',height:'',gender:'male',avatar:''};
+  return{
+    name:data.name||'',
+    age:data.age||'',
+    weight:data.bodyweight||'',
+    height:data.height||'',
+    gender:data.gender||'male',
+    avatar:data.avatar||''
+  };
 }
 async function saveProfileCloud(p){
-  await _sb.from('profile').upsert({user_id:_currentUser.id,name:p.name||null,age:p.age||null,bodyweight:p.weight||null,height:p.height||null,gender:p.gender||'male',avatar:p.avatar||null,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  await _sb.from('profile').upsert({
+    user_id:_currentUser.id,
+    name:p.name||null,
+    age:p.age||null,
+    bodyweight:p.weight||null,
+    height:p.height||null,
+    gender:p.gender||'male',
+    avatar:p.avatar||null,
+    updated_at:new Date().toISOString()
+  },{onConflict:'user_id'});
 }
 
 // ─── Local save stubs (now delegate to cloud) ─────────────────────────────────
@@ -447,20 +467,23 @@ async function bootApp(user){
   await migrateLocalStorageIfNeeded();
   const[cloudSets,cloudEx,cloudProfile]=await Promise.all([loadSetsCloud(),loadExercisesCloud(),loadProfileCloud()]);
 
-  // Seed exercises to cloud if none exist
+  // Seed exercises to cloud if none exist for this user
   if(!cloudEx||cloudEx.length===0){
-    const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'seed_'+i}));
+    // Use user-specific IDs so different users don't conflict
+    const uid=user.id.replace(/-/g,'').slice(0,8);
+    const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'ex_'+uid+'_'+i}));
     exercises=seedEx;
     await saveExercisesCloud(seedEx);
   } else {
     exercises=cloudEx;
   }
 
-  // Seed sets to cloud if none exist
+  // Seed sets to cloud if none exist for this user
   if(cloudSets.length===0){
-    const seedSets=JSON.parse(JSON.stringify(SEED_SETS));
+    const uid=user.id.replace(/-/g,'').slice(0,8);
+    const seedSets=JSON.parse(JSON.stringify(SEED_SETS)).map((s,i)=>({...s,id:'set_'+uid+'_'+i}));
     sets=seedSets;
-    const rows=seedSets.map(s=>({id:s.id||genId(),user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:null}));
+    const rows=seedSets.map(s=>({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:null}));
     await _sb.from('sets').insert(rows);
   } else {
     sets=cloudSets;
@@ -473,12 +496,14 @@ async function bootApp(user){
 
 // ─── Auth state listener ──────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event,session)=>{
-  if(session&&session.user){
-    await bootApp(session.user);
-  } else {
+  if(event==='SIGNED_OUT'||!session){
     _currentUser=null;
+    sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};
     document.getElementById('loginScreen').style.display='block';
     document.querySelector('.app').style.display='none';
+    showLogin();
+  } else if(session&&session.user&&(!_currentUser||_currentUser.id!==session.user.id)){
+    await bootApp(session.user);
   }
 });
 
