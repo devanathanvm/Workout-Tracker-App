@@ -162,34 +162,34 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 <body>
 <!-- ── Login Screen ── -->
 <div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;overflow-y:auto;">
-  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;">
-    <div style="width:100%;max-width:380px;">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;box-sizing:border-box;">
+    <div style="width:100%;max-width:360px;margin:0 auto;">
       <div style="text-align:center;margin-bottom:36px;">
-        <div style="font-size:40px;margin-bottom:12px;">💪</div>
-        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;">Workout Tracker</h1>
-        <p style="font-size:13px;color:var(--text2);margin-top:6px;">Sign in to sync your workouts across devices</p>
+        <div style="font-size:48px;margin-bottom:14px;">💪</div>
+        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;text-align:center;">Workout Tracker</h1>
+        <p style="font-size:13px;color:var(--text2);margin-top:6px;text-align:center;">Sign in to sync your workouts across devices</p>
       </div>
       <div id="loginError" style="display:none;background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;text-align:center;"></div>
       <div id="loginForm">
         <div class="form-field">
-          <label class="form-label">Email</label>
-          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" oninput="clearAuthError()">
+          <label class="form-label" style="display:block;text-align:left;">Email</label>
+          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()">
         </div>
         <div class="form-field">
-          <label class="form-label">Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleLogin()">
+          <label class="form-label" style="display:block;text-align:left;">Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleLogin()">
         </div>
         <button id="loginBtn" class="btn-primary" onclick="handleLogin()" style="margin-top:4px;">Sign In</button>
         <button class="btn-secondary" onclick="showSignup()">Create Account</button>
       </div>
       <div id="signupForm" style="display:none;">
         <div class="form-field">
-          <label class="form-label">Email</label>
-          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" oninput="clearAuthError()">
+          <label class="form-label" style="display:block;text-align:left;">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()">
         </div>
         <div class="form-field">
-          <label class="form-label">Password</label>
-          <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleSignup()">
+          <label class="form-label" style="display:block;text-align:left;">Password</label>
+          <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleSignup()">
         </div>
         <button id="signupBtn" class="btn-primary" onclick="handleSignup()" style="margin-top:4px;">Create Account</button>
         <button class="btn-secondary" onclick="showLogin()">Already have an account? Sign In</button>
@@ -371,15 +371,16 @@ async function handleSignup(){
 
 async function handleLogout(){
   try{
+    document.querySelector('.app').style.display='none';
+    document.getElementById('loginScreen').style.display='flex';
+    showLogin();
     await _sb.auth.signOut();
   }catch(e){console.warn('signOut error',e);}
   sets=[];
   exercises=[];
   profile={name:'',age:'',weight:'',height:''};
+  bwLogs=[];
   _currentUser=null;
-  document.querySelector('.app').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
-  showLogin();
 }
 
 // ─── Cloud Storage ────────────────────────────────────────────────────────────
@@ -430,9 +431,9 @@ async function saveProfile(p){
   const{error}=await _sb.from('profile').upsert({
     user_id:_currentUser.id,
     name:p.name||null,
-    age:p.age||null,
-    bodyweight:p.weight||null,
-    height:p.height||null,
+    age:p.age?parseInt(p.age):null,
+    bodyweight:p.weight?parseFloat(p.weight):null,
+    height:p.height?parseFloat(p.height):null,
     gender:p.gender||'male',
     avatar:p.avatar||null,
     updated_at:new Date().toISOString()
@@ -977,7 +978,7 @@ function renderProfile(){
 
     <!-- Account -->
     <div class="section-label">Account</div>
-    <div class="card fade-in">
+    <div class="card fade-in" style="margin-bottom:40px;">
       <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Signed in as <strong style="color:var(--text);">${_currentUser?_currentUser.email:''}</strong></p>
       <button class="btn-danger" onclick="handleLogout()" style="margin-top:0;">Sign Out</button>
     </div>`;
@@ -990,9 +991,9 @@ async function saveProfileData(){
   profile={
     ...profile,
     name:document.getElementById('pName').value.trim(),
-    age:document.getElementById('pAge').value,
-    weight:document.getElementById('pWeight').value,
-    height:document.getElementById('pHeight').value
+    age:parseInt(document.getElementById('pAge').value)||null,
+    weight:parseFloat(document.getElementById('pWeight').value)||null,
+    height:parseFloat(document.getElementById('pHeight').value)||null
   };
   await saveProfile(profile);
   toast('Profile saved ✓');
