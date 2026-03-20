@@ -446,9 +446,28 @@ async function bootApp(user){
   toast('Loading your data…','#3b82f6');
   await migrateLocalStorageIfNeeded();
   const[cloudSets,cloudEx,cloudProfile]=await Promise.all([loadSetsCloud(),loadExercisesCloud(),loadProfileCloud()]);
-  sets=cloudSets.length>0?cloudSets:JSON.parse(JSON.stringify(SEED_SETS));
-  exercises=cloudEx||JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'seed_'+i}));
+
+  // Seed exercises to cloud if none exist
+  if(!cloudEx||cloudEx.length===0){
+    const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'seed_'+i}));
+    exercises=seedEx;
+    await saveExercisesCloud(seedEx);
+  } else {
+    exercises=cloudEx;
+  }
+
+  // Seed sets to cloud if none exist
+  if(cloudSets.length===0){
+    const seedSets=JSON.parse(JSON.stringify(SEED_SETS));
+    sets=seedSets;
+    const rows=seedSets.map(s=>({id:s.id||genId(),user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:null}));
+    await _sb.from('sets').insert(rows);
+  } else {
+    sets=cloudSets;
+  }
+
   profile=cloudProfile;
+  toast('Ready! 💪');
   renderDashboard();
 }
 
