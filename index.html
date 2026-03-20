@@ -157,48 +157,49 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--green);color:#000;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+#loginScreen *{box-sizing:border-box;}
 </style>
 </head>
 <body>
 <!-- ── Login Screen ── -->
 <div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;overflow-y:auto;">
-  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;box-sizing:border-box;">
-    <div style="width:100%;max-width:360px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:36px;">
-        <div style="font-size:48px;margin-bottom:14px;">💪</div>
-        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;text-align:center;">Workout Tracker</h1>
-        <p style="font-size:13px;color:var(--text2);margin-top:6px;text-align:center;">Sign in to sync your workouts across devices</p>
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;box-sizing:border-box;width:100%;">
+    <div style="width:100%;max-width:360px;margin:0 auto;display:flex;flex-direction:column;align-items:center;">
+      <div style="text-align:center;margin-bottom:36px;width:100%;">
+        <div style="font-size:48px;margin-bottom:14px;text-align:center;">💪</div>
+        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;text-align:center;margin:0 0 6px 0;">Workout Tracker</h1>
+        <p style="font-size:13px;color:var(--text2);text-align:center;margin:0;">Sign in to sync your workouts across devices</p>
       </div>
-      <div id="loginError" style="display:none;background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;text-align:center;"></div>
-      <div id="loginForm">
+      <div id="loginError" style="display:none;background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;text-align:center;width:100%;box-sizing:border-box;"></div>
+      <div id="loginForm" style="width:100%;">
         <div class="form-field">
-          <label class="form-label" style="display:block;text-align:left;">Email</label>
-          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()">
+          <label class="form-label" style="display:block;">Email</label>
+          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;display:block;" oninput="clearAuthError()">
         </div>
         <div class="form-field">
-          <label class="form-label" style="display:block;text-align:left;">Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleLogin()">
+          <label class="form-label" style="display:block;">Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;display:block;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleLogin()">
         </div>
-        <button id="loginBtn" class="btn-primary" onclick="handleLogin()" style="margin-top:4px;">Sign In</button>
-        <button class="btn-secondary" onclick="showSignup()">Create Account</button>
+        <button id="loginBtn" class="btn-primary" onclick="handleLogin()" style="margin-top:4px;width:100%;display:block;">Sign In</button>
+        <button class="btn-secondary" onclick="showSignup()" style="width:100%;display:block;">Create Account</button>
       </div>
-      <div id="signupForm" style="display:none;">
+      <div id="signupForm" style="display:none;width:100%;">
         <div class="form-field">
-          <label class="form-label" style="display:block;text-align:left;">Email</label>
-          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()">
+          <label class="form-label" style="display:block;">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;display:block;" oninput="clearAuthError()">
         </div>
         <div class="form-field">
-          <label class="form-label" style="display:block;text-align:left;">Password</label>
-          <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleSignup()">
+          <label class="form-label" style="display:block;">Password</label>
+          <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;display:block;" oninput="clearAuthError()" onkeydown="if(event.key==='Enter')handleSignup()">
         </div>
-        <button id="signupBtn" class="btn-primary" onclick="handleSignup()" style="margin-top:4px;">Create Account</button>
-        <button class="btn-secondary" onclick="showLogin()">Already have an account? Sign In</button>
+        <button id="signupBtn" class="btn-primary" onclick="handleSignup()" style="margin-top:4px;width:100%;display:block;">Create Account</button>
+        <button class="btn-secondary" onclick="showLogin()" style="width:100%;display:block;">Already have an account? Sign In</button>
       </div>
-      <div id="confirmMsg" style="display:none;text-align:center;padding:20px;background:var(--green-dim);border:0.5px solid rgba(29,185,84,0.3);border-radius:var(--radius);margin-top:16px;">
+      <div id="confirmMsg" style="display:none;text-align:center;padding:20px;background:var(--green-dim);border:0.5px solid rgba(29,185,84,0.3);border-radius:var(--radius);margin-top:16px;width:100%;box-sizing:border-box;">
         <div style="font-size:24px;margin-bottom:10px;">📬</div>
         <p style="font-size:14px;font-weight:600;color:var(--green);">Check your email!</p>
         <p style="font-size:12px;color:var(--text2);margin-top:6px;">We sent a confirmation link. Click it to activate your account, then sign in.</p>
-        <button class="btn-secondary" onclick="showLogin()" style="margin-top:16px;">Back to Sign In</button>
+        <button class="btn-secondary" onclick="showLogin()" style="margin-top:16px;width:100%;">Back to Sign In</button>
       </div>
     </div>
   </div>
