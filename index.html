@@ -370,15 +370,16 @@ async function handleSignup(){
 }
 
 async function handleLogout(){
-  await _sb.auth.signOut();
+  try{
+    await _sb.auth.signOut();
+  }catch(e){console.warn('signOut error',e);}
   sets=[];
   exercises=[];
   profile={name:'',age:'',weight:'',height:''};
   _currentUser=null;
-  document.getElementById('loginScreen').style.display='block';
   document.querySelector('.app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
   showLogin();
-  toast('Signed out successfully');
 }
 
 // ─── Cloud Storage ────────────────────────────────────────────────────────────
@@ -496,18 +497,26 @@ async function bootApp(user){
 
 // ─── Auth state listener ──────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_OUT'||!session){
+  if(event==='SIGNED_IN'&&session&&session.user){
+    await bootApp(session.user);
+  } else if(event==='SIGNED_OUT'||!session){
     _currentUser=null;
     sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};
-    document.getElementById('loginScreen').style.display='block';
     document.querySelector('.app').style.display='none';
+    document.getElementById('loginScreen').style.display='flex';
     showLogin();
-  } else if(session&&session.user&&(!_currentUser||_currentUser.id!==session.user.id)){
-    await bootApp(session.user);
   }
 });
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Check existing session on page load ─────────────────────────────────────
+(async()=>{
+  const{data:{session}}=await _sb.auth.getSession();
+  if(session&&session.user){
+    await bootApp(session.user);
+  } else {
+    document.getElementById('loginScreen').style.display='flex';
+  }
+})();
 let sets=[];
 let exercises=[];
 let profile={name:'',age:'',weight:'',height:''};
@@ -842,6 +851,32 @@ function renderProfile(){
       <button class="btn-primary" style="margin-top:14px;" onclick="saveProfileData()">Save Profile</button>
     </div>
 
+    <!-- Body Weight Tracker -->
+    <div class="section-label">Body Weight Tracker</div>
+    <div class="card fade-in">
+      <div style="display:flex;gap:8px;margin-bottom:14px;align-items:flex-end;">
+        <div class="form-field" style="margin:0;flex:1;">
+          <label class="form-label">Weight</label>
+          <input type="number" id="bwInput" placeholder="75.5" step="0.1" inputmode="decimal" style="width:100%;padding:11px 12px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;">
+        </div>
+        <div class="form-field" style="margin:0;width:70px;">
+          <label class="form-label">Unit</label>
+          <select id="bwUnit" style="width:100%;padding:11px 8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;">
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin:0;flex:1;">
+          <label class="form-label">Date</label>
+          <input type="date" id="bwDate" value="${todayStr()}" style="width:100%;padding:11px 12px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;">
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-bottom:14px;" onclick="logBodyWeight()">Log Weight</button>
+      <div id="bwChart" style="display:none;"><div class="chart-wrap"><canvas id="bwChartCanvas"></canvas></div></div>
+      <div id="bwStats" style="display:none;margin-top:12px;"></div>
+      <div id="bwHistory" style="margin-top:12px;"></div>
+    </div>
+
     <!-- BMI Calculator -->
     <div class="section-label">BMI Calculator</div>
     <div class="card fade-in">
@@ -948,6 +983,7 @@ function renderProfile(){
     </div>`;
 
   if(p.weight&&p.height)calcBMI();
+  loadAndRenderBWChart();
 }
 
 async function saveProfileData(){
@@ -963,7 +999,130 @@ async function saveProfileData(){
   renderProfile();
 }
 
-// BMI
+// ─── Body Weight Tracker ──────────────────────────────────────────────────────
+let bwLogs=[];
+
+async function loadBWLogs(){
+  const{data,error}=await _sb.from('bodyweight_log').select('*').eq('user_id',_currentUser.id).order('date',{ascending:true});
+  if(error){console.error('loadBWLogs',error);return[];}
+  return data||[];
+}
+
+async function logBodyWeight(){
+  const val=parseFloat(document.getElementById('bwInput').value);
+  const unit=document.getElementById('bwUnit').value;
+  const date=document.getElementById('bwDate').value;
+  if(!val||val<=0){toast('Enter a valid weight','#ef4444');return;}
+  if(!date){toast('Select a date','#ef4444');return;}
+  const id=genId();
+  const{error}=await _sb.from('bodyweight_log').upsert({id,user_id:_currentUser.id,weight:val,unit,date},{onConflict:'id'});
+  if(error){toast('Error saving weight','#ef4444');return;}
+  bwLogs=await loadBWLogs();
+  document.getElementById('bwInput').value='';
+  toast('Weight logged ✓');
+  renderBWChart();
+}
+
+async function deleteBWLog(id){
+  await _sb.from('bodyweight_log').delete().eq('id',id).eq('user_id',_currentUser.id);
+  bwLogs=await loadBWLogs();
+  renderBWChart();
+  toast('Entry deleted');
+}
+
+function renderBWChart(){
+  const chartWrap=document.getElementById('bwChart');
+  const statsWrap=document.getElementById('bwStats');
+  const histWrap=document.getElementById('bwHistory');
+  if(!chartWrap||!statsWrap||!histWrap)return;
+
+  if(bwLogs.length===0){
+    chartWrap.style.display='none';
+    statsWrap.style.display='none';
+    histWrap.innerHTML='<p style="font-size:13px;color:var(--text2);text-align:center;padding:10px 0;">No weight logged yet. Add your first entry above!</p>';
+    return;
+  }
+
+  // Convert all to kg for consistency
+  const toKgBW=(w,u)=>u==='lb'?Math.round(w*0.453592*10)/10:w;
+  const logsKg=bwLogs.map(l=>({...l,wKg:toKgBW(l.weight,l.unit)}));
+
+  // Stats
+  const first=logsKg[0];
+  const last=logsKg[logsKg.length-1];
+  const diff=Math.round((last.wKg-first.wKg)*10)/10;
+  const diffColor=diff<0?'var(--green)':diff>0?'var(--red)':'var(--text2)';
+  const diffLabel=diff<0?'▼ '+Math.abs(diff)+'kg lost':'▲ '+diff+'kg gained';
+
+  statsWrap.style.display='block';
+  statsWrap.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px;">
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">START</div>
+      <div style="font-size:15px;font-weight:600;">${first.wKg}kg</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">CURRENT</div>
+      <div style="font-size:15px;font-weight:600;color:var(--green);">${last.wKg}kg</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">CHANGE</div>
+      <div style="font-size:15px;font-weight:600;color:${diffColor};">${diff===0?'—':diffLabel}</div>
+    </div>
+  </div>`;
+
+  // Chart
+  if(bwLogs.length>=2){
+    chartWrap.style.display='block';
+    setTimeout(()=>{
+      const ctx=document.getElementById('bwChartCanvas');if(!ctx)return;
+      if(chartInstances['bw'])chartInstances['bw'].destroy();
+      chartInstances['bw']=new Chart(ctx,{
+        type:'line',
+        data:{
+          labels:logsKg.map(l=>fmtDateShort(l.date)),
+          datasets:[{
+            data:logsKg.map(l=>l.wKg),
+            borderColor:'#1DB954',
+            backgroundColor:'rgba(29,185,84,0.08)',
+            fill:true,
+            tension:0.35,
+            pointBackgroundColor:'#1DB954',
+            pointRadius:4,
+            pointHoverRadius:6
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{
+            x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},
+            y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'kg'}}
+          }
+        }
+      });
+    },50);
+  } else {
+    chartWrap.style.display='none';
+  }
+
+  // History list
+  histWrap.innerHTML=`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Log History</div>`+
+    [...logsKg].reverse().map(l=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:4px;">
+      <div>
+        <div style="font-size:13px;font-weight:600;">${l.wKg} kg</div>
+        <div style="font-size:11px;color:var(--text2);">${fmtDate(l.date)}</div>
+      </div>
+      <button class="icon-btn del-btn" onclick="deleteBWLog('${l.id}')">✕</button>
+    </div>`).join('');
+}
+
+// Load BW logs when profile renders
+async function loadAndRenderBWChart(){
+  bwLogs=await loadBWLogs();
+  renderBWChart();
+}
 function calcBMI(){
   const w=parseFloat(document.getElementById('bmiW').value);
   const h=parseFloat(document.getElementById('bmiH').value);
