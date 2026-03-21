@@ -265,197 +265,69 @@ const SEED_SETS=[
   {id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:15,r:9},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:17.5,r:8},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:20,r:9},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:25,r:3}
 ];
 
-// ─── Exercise Field Preferences ───────────────────────────────────────────────
-// Fields: 'weight' | 'assisted' | 'reps' | 'duration' | 'distance'
-// Stored in Supabase exercise_preferences table per user per exercise
-// Also cached in memory for instant access
-let exPrefs={}; // { "Pull Up": ["reps"], "Running": ["distance","duration"], ... }
-
-const EX_DEFAULT_FIELDS={
-  // Cardio
-  "Aerobics":["distance","duration"],"Battle Ropes":["duration"],"Cycling":["distance","duration"],
-  "Cycling (Indoor)":["distance","duration"],"Elliptical Machine":["duration"],
-  "Hiking":["distance","duration"],"Jump Rope":["duration"],"Rowing (Machine)":["distance","duration"],
-  "Running":["distance","duration"],"Running (Treadmill)":["distance","duration"],
-  "Skating":["distance","duration"],"Skiing":["distance","duration"],
-  "Snowboarding":["distance","duration"],"Swimming":["distance","duration"],"Walking":["distance","duration"],
-  // Duration only
-  "Stretching":["duration"],"Yoga":["duration"],"Climbing":["duration"],
-  // Bodyweight reps
-  "Ab Wheel":["reps"],"Bicycle Crunch":["reps"],"Box Jump":["reps"],"Burpee":["reps"],
-  "Chin Up":["reps"],"Chin Up (Assisted)":["assisted","reps"],"Cross Body Crunch":["reps"],
-  "Crunch":["reps"],"Decline Crunch":["reps"],"Flat Knee Raise":["reps"],"Flat Leg Raise":["reps"],
-  "Glute Ham Raise":["reps"],"Handstand Push Up":["reps"],"Hanging Knee Raise":["reps"],
-  "Hanging Leg Raise":["reps"],"High Knee Skips":["reps"],"Hip Thrust (Bodyweight)":["reps"],
-  "Inverted Row (Bodyweight)":["reps"],"Jackknife Sit Up":["reps"],"Jump Squat":["reps"],
-  "Jumping Jack":["reps"],"Knee Raise (Captain's Chair)":["reps"],"Kipping Pull Up":["reps"],
-  "Knees to Elbows":["reps"],"Lateral Box Jump":["reps"],"Lunge (Bodyweight)":["reps"],
-  "Mountain Climber":["reps"],"Muscle Up":["reps"],"Oblique Crunch":["reps"],
-  "Pistol Squat":["reps"],"Pull Up":["reps"],"Pull Up (Assisted)":["assisted","reps"],
-  "Pull Up (Band)":["assisted","reps"],"Push Up":["reps"],"Push Up (Band)":["reps"],
-  "Push Up (Knees)":["reps"],"Reverse Crunch":["reps"],"Reverse Plank":["duration"],
-  "Russian Twist":["reps"],"Sit Up":["reps"],"Squat (Bodyweight)":["reps"],
-  "Standing Calf Raise (Bodyweight)":["reps"],"Step-up":["reps"],"Superman":["reps"],
-  "Toes To Bar":["reps"],"V Up":["reps"],"Wide Pull Up":["reps"],
-  // Timed bodyweight
-  "Plank":["duration"],"Side Plank":["duration"],"Single Leg Bridge":["reps"],
-  "Hip Thrust (Bodyweight)":["reps"],
-};
-
-function getExFields(exName){
-  // User saved pref wins, else default, else weight+reps
-  return exPrefs[exName]||EX_DEFAULT_FIELDS[exName]||['weight','reps'];
-}
-
-async function loadExPrefsCloud(){
-  const{data,error}=await _sb.from('exercise_preferences').select('*').eq('user_id',_currentUser.id);
-  if(error||!data)return;
-  exPrefs={};
-  data.forEach(r=>{exPrefs[r.exercise]=r.fields;});
-}
-
-async function saveExPrefCloud(exName,fields){
-  exPrefs[exName]=fields;
-  await _sb.from('exercise_preferences').upsert({
-    id:_currentUser.id+'_'+exName.replace(/[^a-z0-9]/gi,'_').toLowerCase(),
-    user_id:_currentUser.id,
-    exercise:exName,
-    fields:fields
-  },{onConflict:'id'});
-}
-
 const SEED_EXERCISES=[
-  {name:"Ab Wheel",cat:"Core"},{name:"Aerobics",cat:"Cardio"},
-  {name:"Arnold Press (Dumbbell)",cat:"Shoulders"},{name:"Around the World",cat:"Shoulders"},
-  {name:"Back Extension",cat:"Back"},{name:"Back Extension (Machine)",cat:"Back"},
-  {name:"Ball Slams",cat:"Full Body"},{name:"Battle Ropes",cat:"Cardio"},
-  {name:"Bench Dip",cat:"Triceps"},
-  {name:"Bench Press - Close Grip (Barbell)",cat:"Chest"},{name:"Bench Press - Wide Grip (Barbell)",cat:"Chest"},
-  {name:"Bench Press (Cable)",cat:"Chest"},{name:"Bench Press (Dumbbell)",cat:"Chest"},
-  {name:"Bench Press (Smith Machine)",cat:"Chest"},{name:"Bench Press (Barbell)",cat:"Chest"},
-  {name:"Bent Over Row - Underhand (Barbell)",cat:"Back"},{name:"Bent Over Row (Band)",cat:"Back"},
-  {name:"Bent Over Row (Dumbbell)",cat:"Back"},{name:"Bent Over Row (Barbell)",cat:"Back"},
-  {name:"Bent Over One Arm Row (Dumbbell)",cat:"Back"},
-  {name:"Bicep Curl (Cable)",cat:"Biceps"},{name:"Bicep Curl (Machine)",cat:"Biceps"},
-  {name:"Bicep Curl (Barbell)",cat:"Biceps"},{name:"Bicep Curl (Dumbbell)",cat:"Biceps"},
-  {name:"Bicycle Crunch",cat:"Core"},{name:"Box Jump",cat:"Legs"},
-  {name:"Box Squat (Barbell)",cat:"Legs"},{name:"Bulgarian Split Squat",cat:"Legs"},
-  {name:"Burpee",cat:"Full Body"},{name:"Cable Crossover",cat:"Chest"},
-  {name:"Cable Crunch",cat:"Core"},{name:"Cable Kickback",cat:"Glutes"},
-  {name:"Cable Pull Through",cat:"Glutes"},{name:"Cable Twist",cat:"Core"},
-  {name:"Calf Press on Leg Press",cat:"Legs"},{name:"Calf Press on Seated Leg Press",cat:"Legs"},
-  {name:"Chest Dip",cat:"Chest"},{name:"Chest Dip (Assisted)",cat:"Chest"},
-  {name:"Chest Fly (Band)",cat:"Chest"},{name:"Chest Fly (Dumbbell)",cat:"Chest"},
-  {name:"Chest Fly",cat:"Chest"},{name:"Chest Press (Band)",cat:"Chest"},
-  {name:"Chest Press (Machine)",cat:"Chest"},{name:"Chin Up",cat:"Back"},
-  {name:"Chin Up (Assisted)",cat:"Back"},{name:"Clean (Barbell)",cat:"Full Body"},
-  {name:"Clean and Jerk (Barbell)",cat:"Full Body"},{name:"Climbing",cat:"Cardio"},
-  {name:"Concentration Curl (Dumbbell)",cat:"Biceps"},{name:"Cross Body Crunch",cat:"Core"},
-  {name:"Crunch",cat:"Core"},{name:"Crunch (Machine)",cat:"Core"},
-  {name:"Crunch (Stability Ball)",cat:"Core"},{name:"Cycling",cat:"Cardio"},
-  {name:"Cycling (Indoor)",cat:"Cardio"},{name:"Deadlift (Band)",cat:"Back"},
-  {name:"Deadlift (Barbell)",cat:"Back"},{name:"Deadlift (Dumbbell)",cat:"Back"},
-  {name:"Deadlift (Smith Machine)",cat:"Back"},{name:"Deadlift High Pull (Barbell)",cat:"Full Body"},
-  {name:"Decline Bench Press (Barbell)",cat:"Chest"},{name:"Decline Bench Press (Dumbbell)",cat:"Chest"},
-  {name:"Decline Bench Press (Smith Machine)",cat:"Chest"},{name:"Decline Crunch",cat:"Core"},
-  {name:"Deficit Deadlift (Barbell)",cat:"Back"},{name:"Elliptical Machine",cat:"Cardio"},
-  {name:"Face Pull (Cable)",cat:"Shoulders"},{name:"Flat Knee Raise",cat:"Core"},
-  {name:"Flat Leg Raise",cat:"Core"},{name:"Floor Press (Barbell)",cat:"Chest"},
-  {name:"Front Raise (Band)",cat:"Shoulders"},{name:"Front Raise (Barbell)",cat:"Shoulders"},
-  {name:"Front Raise (Cable)",cat:"Shoulders"},{name:"Front Raise (Dumbbell)",cat:"Shoulders"},
-  {name:"Front Raise (Plate)",cat:"Shoulders"},{name:"Front Squat (Barbell)",cat:"Legs"},
-  {name:"Glute Ham Raise",cat:"Legs"},{name:"Glute Kickback (Machine)",cat:"Glutes"},
-  {name:"Goblet Squat (Kettlebell)",cat:"Legs"},{name:"Good Morning (Barbell)",cat:"Back"},
-  {name:"Hack Squat",cat:"Legs"},{name:"Hack Squat (Barbell)",cat:"Legs"},
-  {name:"Hammer Curl (Band)",cat:"Biceps"},{name:"Hammer Curl (Cable)",cat:"Biceps"},
-  {name:"Hammer Curl (Dumbbell)",cat:"Biceps"},{name:"Handstand Push Up",cat:"Shoulders"},
-  {name:"Hang Clean (Barbell)",cat:"Full Body"},{name:"Hang Snatch (Barbell)",cat:"Full Body"},
-  {name:"Hanging Knee Raise",cat:"Core"},{name:"Hanging Leg Raise",cat:"Core"},
-  {name:"High Knee Skips",cat:"Cardio"},{name:"Hiking",cat:"Cardio"},
-  {name:"Hip Abductor (Machine)",cat:"Legs"},{name:"Hip Adductor (Machine)",cat:"Legs"},
-  {name:"Hip Thrust (Barbell)",cat:"Glutes"},{name:"Hip Thrust (Bodyweight)",cat:"Glutes"},
-  {name:"Incline Bench Press (Barbell)",cat:"Chest"},{name:"Incline Bench Press (Cable)",cat:"Chest"},
-  {name:"Incline Bench Press (Dumbbell)",cat:"Chest"},{name:"Incline Bench Press (Smith Machine)",cat:"Chest"},
-  {name:"Incline Chest Fly (Dumbbell)",cat:"Chest"},{name:"Incline Chest Press (Machine)",cat:"Chest"},
-  {name:"Incline Curl (Dumbbell)",cat:"Biceps"},{name:"Incline Row (Dumbbell)",cat:"Back"},
-  {name:"Inverted Row (Bodyweight)",cat:"Back"},{name:"Iso-Lateral Chest Press (Machine)",cat:"Chest"},
-  {name:"Iso-Lateral Row (Machine)",cat:"Back"},{name:"Jackknife Sit Up",cat:"Core"},
-  {name:"Jump Rope",cat:"Cardio"},{name:"Jump Shrug (Barbell)",cat:"Shoulders"},
-  {name:"Jump Squat",cat:"Legs"},{name:"Jumping Jack",cat:"Cardio"},
-  {name:"Kettlebell Swing",cat:"Full Body"},{name:"Kettlebell Turkish Get Up",cat:"Full Body"},
-  {name:"Kipping Pull Up",cat:"Back"},{name:"Knee Raise (Captain's Chair)",cat:"Core"},
-  {name:"Kneeling Pulldown (Band)",cat:"Back"},{name:"Knees to Elbows",cat:"Core"},
-  {name:"Lat Pulldown - Underhand (Band)",cat:"Back"},{name:"Lat Pulldown - Underhand (Cable)",cat:"Back"},
-  {name:"Lat Pulldown - Wide Grip (Cable)",cat:"Back"},{name:"Lat Pulldown (Machine)",cat:"Back"},
-  {name:"Lat Pulldown (Single Arm)",cat:"Back"},{name:"Lat Pulldown (Cable)",cat:"Back"},
-  {name:"Lateral Box Jump",cat:"Legs"},{name:"Lateral Raise (Band)",cat:"Shoulders"},
-  {name:"Lateral Raise (Cable)",cat:"Shoulders"},{name:"Lateral Raise (Dumbbell)",cat:"Shoulders"},
-  {name:"Lateral Raise (Machine)",cat:"Shoulders"},{name:"Lunge (Barbell)",cat:"Legs"},
-  {name:"Lunge (Bodyweight)",cat:"Legs"},{name:"Lunge (Dumbbell)",cat:"Legs"},
-  {name:"Mountain Climber",cat:"Core"},{name:"Muscle Up",cat:"Back"},
-  {name:"Oblique Crunch",cat:"Core"},{name:"Overhead Press (Barbell)",cat:"Shoulders"},
-  {name:"Overhead Press (Cable)",cat:"Shoulders"},{name:"Overhead Press (Smith Machine)",cat:"Shoulders"},
-  {name:"Overhead Press (Dumbbell)",cat:"Shoulders"},{name:"Overhead Squat (Barbell)",cat:"Legs"},
-  {name:"Pec Deck (Machine)",cat:"Chest"},{name:"Pendlay Row (Barbell)",cat:"Back"},
-  {name:"Pistol Squat",cat:"Legs"},{name:"Plank",cat:"Core"},
-  {name:"Power Clean",cat:"Full Body"},{name:"Power Snatch (Barbell)",cat:"Full Body"},
-  {name:"Preacher Curl (Barbell)",cat:"Biceps"},{name:"Preacher Curl (Dumbbell)",cat:"Biceps"},
-  {name:"Preacher Curl (Machine)",cat:"Biceps"},{name:"Press Under (Barbell)",cat:"Shoulders"},
-  {name:"Pull Up",cat:"Back"},{name:"Pull Up (Assisted)",cat:"Back"},
-  {name:"Pull Up (Band)",cat:"Back"},{name:"Pullover (Dumbbell)",cat:"Back"},
-  {name:"Pullover (Machine)",cat:"Back"},{name:"Push Press",cat:"Shoulders"},
-  {name:"Push Up",cat:"Chest"},{name:"Push Up (Band)",cat:"Chest"},
-  {name:"Push Up (Knees)",cat:"Chest"},{name:"Rack Pull (Barbell)",cat:"Back"},
-  {name:"Reverse Crunch",cat:"Core"},{name:"Reverse Curl (Band)",cat:"Biceps"},
-  {name:"Reverse Curl (Dumbbell)",cat:"Biceps"},{name:"Reverse Curl (Barbell)",cat:"Biceps"},
-  {name:"Reverse Fly (Cable)",cat:"Shoulders"},{name:"Reverse Fly (Dumbbell)",cat:"Shoulders"},
-  {name:"Reverse Fly (Machine)",cat:"Shoulders"},
-  {name:"Reverse Grip Concentration Curl (Dumbbell)",cat:"Biceps"},
-  {name:"Reverse Plank",cat:"Core"},{name:"Romanian Deadlift (Barbell)",cat:"Back"},
-  {name:"Romanian Deadlift (Dumbbell)",cat:"Back"},{name:"Rowing (Machine)",cat:"Cardio"},
-  {name:"Running",cat:"Cardio"},{name:"Running (Treadmill)",cat:"Cardio"},
-  {name:"Russian Twist",cat:"Core"},{name:"Seated Calf Raise (Machine)",cat:"Legs"},
-  {name:"Seated Calf Raise (Plate Loaded)",cat:"Legs"},{name:"Seated Leg Curl (Machine)",cat:"Legs"},
+  {name:"Ab Wheel",cat:"Core"},{name:"Aerobics",cat:"Cardio"},{name:"Arnold Press (Dumbbell)",cat:"Shoulders"},
+  {name:"Back Extension",cat:"Back"},{name:"Ball Slams",cat:"Full Body"},{name:"Battle Ropes",cat:"Cardio"},
+  {name:"Bench Dip",cat:"Triceps"},{name:"Bench Press (Barbell)",cat:"Chest"},{name:"Bench Press (Dumbbell)",cat:"Chest"},
+  {name:"Bench Press (Cable)",cat:"Chest"},{name:"Bench Press (Smith Machine)",cat:"Chest"},
+  {name:"Bent Over One Arm Row (Dumbbell)",cat:"Back"},{name:"Bent Over Row (Barbell)",cat:"Back"},
+  {name:"Bent Over Row (Dumbbell)",cat:"Back"},{name:"Bicep Curl (Barbell)",cat:"Biceps"},
+  {name:"Bicep Curl (Cable)",cat:"Biceps"},{name:"Bicep Curl (Dumbbell)",cat:"Biceps"},
+  {name:"Bicep Curl (Machine)",cat:"Biceps"},{name:"Box Jump",cat:"Legs"},{name:"Box Squat (Barbell)",cat:"Legs"},
+  {name:"Bulgarian Split Squat",cat:"Legs"},{name:"Burpee",cat:"Full Body"},{name:"Cable Crunch",cat:"Core"},
+  {name:"Cable Crossover",cat:"Chest"},{name:"Calf Press on Leg Press",cat:"Legs"},{name:"Chest Dip",cat:"Chest"},
+  {name:"Chest Fly",cat:"Chest"},{name:"Chest Fly (Dumbbell)",cat:"Chest"},{name:"Chest Press (Machine)",cat:"Chest"},
+  {name:"Chin Up",cat:"Back"},{name:"Clean (Barbell)",cat:"Full Body"},{name:"Concentration Curl (Dumbbell)",cat:"Biceps"},
+  {name:"Crunch",cat:"Core"},{name:"Deadlift (Barbell)",cat:"Back"},{name:"Deadlift (Dumbbell)",cat:"Back"},
+  {name:"Decline Bench Press (Barbell)",cat:"Chest"},{name:"Decline Crunch",cat:"Core"},
+  {name:"Elliptical Machine",cat:"Cardio"},{name:"Face Pull (Cable)",cat:"Shoulders"},
+  {name:"Farmer's Carry",cat:"Full Body"},
+  {name:"Front Raise (Dumbbell)",cat:"Shoulders"},{name:"Front Squat (Barbell)",cat:"Legs"},
+  {name:"Glute Ham Raise",cat:"Legs"},{name:"Goblet Squat (Kettlebell)",cat:"Legs"},
+  {name:"Good Morning (Barbell)",cat:"Back"},{name:"Hack Squat",cat:"Legs"},
+  {name:"Hammer Curl (Dumbbell)",cat:"Biceps"},{name:"Hanging Knee Raise",cat:"Core"},
+  {name:"Hanging Leg Raise",cat:"Core"},{name:"Hip Thrust (Barbell)",cat:"Glutes"},
+  {name:"Incline Bench Press (Barbell)",cat:"Chest"},{name:"Incline Bench Press (Dumbbell)",cat:"Chest"},
+  {name:"Incline Chest Fly (Dumbbell)",cat:"Chest"},{name:"Jump Rope",cat:"Cardio"},
+  {name:"Jump Squat",cat:"Legs"},{name:"Kettlebell Swing",cat:"Full Body"},
+  {name:"Knee Raise (Captain's Chair)",cat:"Core"},{name:"Lat Pulldown (Cable)",cat:"Back"},
+  {name:"Lat Pulldown (Machine)",cat:"Back"},{name:"Lateral Raise (Dumbbell)",cat:"Shoulders"},
+  {name:"Lateral Raise (Cable)",cat:"Shoulders"},{name:"Leg Extension (Machine)",cat:"Legs"},
+  {name:"Lunge (Barbell)",cat:"Legs"},{name:"Lunge (Bodyweight)",cat:"Legs"},{name:"Lunge (Dumbbell)",cat:"Legs"},
+  {name:"Lying Leg Curl (Machine)",cat:"Legs"},{name:"Mountain Climber",cat:"Core"},
+  {name:"Muscle Up",cat:"Back"},{name:"Overhead Press (Barbell)",cat:"Shoulders"},
+  {name:"Overhead Press (Dumbbell)",cat:"Shoulders"},{name:"Pec Deck (Machine)",cat:"Chest"},
+  {name:"Pendlay Row (Barbell)",cat:"Back"},{name:"Pistol Squat",cat:"Legs"},{name:"Plank",cat:"Core"},
+  {name:"Power Clean",cat:"Full Body"},{name:"Preacher Curl (Barbell)",cat:"Biceps"},
+  {name:"Preacher Curl (Dumbbell)",cat:"Biceps"},{name:"Pull Up",cat:"Back"},
+  {name:"Pullover (Dumbbell)",cat:"Back"},{name:"Push Press",cat:"Shoulders"},
+  {name:"Push Up",cat:"Chest"},{name:"Rack Pull (Barbell)",cat:"Back"},
+  {name:"Reverse Crunch",cat:"Core"},{name:"Reverse Curl (Barbell)",cat:"Biceps"},
+  {name:"Reverse Curl (Dumbbell)",cat:"Biceps"},{name:"Reverse Fly (Dumbbell)",cat:"Shoulders"},
+  {name:"Romanian Deadlift (Barbell)",cat:"Back"},{name:"Romanian Deadlift (Dumbbell)",cat:"Back"},
+  {name:"Rowing (Machine)",cat:"Cardio"},{name:"Running",cat:"Cardio"},{name:"Russian Twist",cat:"Core"},
+  {name:"Seated Calf Raise (Machine)",cat:"Legs"},{name:"Seated Leg Curl (Machine)",cat:"Legs"},
   {name:"Seated Leg Press (Machine)",cat:"Legs"},{name:"Seated Overhead Press (Barbell)",cat:"Shoulders"},
-  {name:"Seated Overhead Press (Dumbbell)",cat:"Shoulders"},
-  {name:"Seated Palms Up Wrist Curl (Dumbbell)",cat:"Full Body"},
-  {name:"Seated Row (Machine)",cat:"Back"},{name:"Seated Row (Cable)",cat:"Back"},
-  {name:"Seated Wide-Grip Row (Cable)",cat:"Back"},{name:"Shoulder Press (Machine)",cat:"Shoulders"},
-  {name:"Shoulder Press (Plate Loaded)",cat:"Shoulders"},{name:"Shrug (Barbell)",cat:"Shoulders"},
-  {name:"Shrug (Dumbbell)",cat:"Shoulders"},{name:"Shrug (Machine)",cat:"Shoulders"},
-  {name:"Shrug (Smith Machine)",cat:"Shoulders"},{name:"Side Bend (Band)",cat:"Core"},
-  {name:"Side Bend (Cable)",cat:"Core"},{name:"Side Bend (Dumbbell)",cat:"Core"},
-  {name:"Side Plank",cat:"Core"},{name:"Single Leg Bridge",cat:"Glutes"},
-  {name:"Sit Up",cat:"Core"},{name:"Skating",cat:"Cardio"},{name:"Skiing",cat:"Cardio"},
-  {name:"Skullcrusher (Barbell)",cat:"Triceps"},{name:"Skullcrusher (Dumbbell)",cat:"Triceps"},
-  {name:"Snatch (Barbell)",cat:"Full Body"},{name:"Snatch Pull (Barbell)",cat:"Full Body"},
-  {name:"Snowboarding",cat:"Cardio"},{name:"Split Jerk (Barbell)",cat:"Full Body"},
-  {name:"Squat (Band)",cat:"Legs"},{name:"Squat (Barbell)",cat:"Legs"},
+  {name:"Seated Overhead Press (Dumbbell)",cat:"Shoulders"},{name:"Seated Row (Cable)",cat:"Back"},
+  {name:"Seated Row (Machine)",cat:"Back"},{name:"Shoulder Press (Machine)",cat:"Shoulders"},
+  {name:"Shrug (Barbell)",cat:"Shoulders"},{name:"Shrug (Dumbbell)",cat:"Shoulders"},
+  {name:"Side Plank",cat:"Core"},{name:"Sit Up",cat:"Core"},{name:"Skullcrusher (Barbell)",cat:"Triceps"},
+  {name:"Skullcrusher (Dumbbell)",cat:"Triceps"},{name:"Squat (Barbell)",cat:"Legs"},
   {name:"Squat (Bodyweight)",cat:"Legs"},{name:"Squat (Dumbbell)",cat:"Legs"},
-  {name:"Squat (Machine)",cat:"Legs"},{name:"Squat (Smith Machine)",cat:"Legs"},
-  {name:"Squat Row (Band)",cat:"Full Body"},{name:"Standing Calf Raise (Barbell)",cat:"Legs"},
-  {name:"Standing Calf Raise (Dumbbell)",cat:"Legs"},{name:"Standing Calf Raise (Machine)",cat:"Legs"},
-  {name:"Standing Calf Raise (Smith Machine)",cat:"Legs"},
-  {name:"Standing Calf Raise (Bodyweight)",cat:"Legs"},{name:"Step-up",cat:"Legs"},
-  {name:"Stiff Leg Deadlift (Barbell)",cat:"Back"},{name:"Stiff Leg Deadlift (Dumbbell)",cat:"Back"},
-  {name:"Straight Leg Deadlift (Band)",cat:"Back"},{name:"Stretching",cat:"Flexibility"},
-  {name:"Strict Military Press (Barbell)",cat:"Shoulders"},{name:"Sumo Deadlift (Barbell)",cat:"Back"},
-  {name:"Sumo Deadlift High Pull (Barbell)",cat:"Back"},{name:"Superman",cat:"Core"},
-  {name:"Swimming",cat:"Cardio"},{name:"T Bar Row",cat:"Back"},
-  {name:"Thruster (Barbell)",cat:"Full Body"},{name:"Thruster (Kettlebell)",cat:"Full Body"},
-  {name:"Toes To Bar",cat:"Core"},{name:"Torso Rotation (Machine)",cat:"Core"},
-  {name:"Trap Bar Deadlift",cat:"Back"},{name:"Triceps Dip",cat:"Triceps"},
-  {name:"Triceps Dip (Assisted)",cat:"Triceps"},{name:"Triceps Extension",cat:"Triceps"},
-  {name:"Triceps Extension (Barbell)",cat:"Triceps"},{name:"Triceps Extension (Cable)",cat:"Triceps"},
-  {name:"Triceps Extension (Machine)",cat:"Triceps"},{name:"Triceps Extension (Dumbbell)",cat:"Triceps"},
-  {name:"Triceps Pushdown (Cable - Straight Bar)",cat:"Triceps"},
-  {name:"Upright Row (Barbell)",cat:"Shoulders"},{name:"Upright Row (Cable)",cat:"Shoulders"},
-  {name:"Upright Row (Dumbbell)",cat:"Shoulders"},{name:"V Up",cat:"Core"},
-  {name:"Walking",cat:"Cardio"},{name:"Wide Pull Up",cat:"Back"},{name:"Wrist Roller",cat:"Full Body"},
+  {name:"Squat (Machine)",cat:"Legs"},{name:"Standing Calf Raise (Barbell)",cat:"Legs"},
+  {name:"Standing Calf Raise (Bodyweight)",cat:"Legs"},{name:"Standing Calf Raise (Dumbbell)",cat:"Legs"},
+  {name:"Standing Calf Raise (Machine)",cat:"Legs"},{name:"Step-up",cat:"Legs"},
+  {name:"Stiff Leg Deadlift (Barbell)",cat:"Back"},{name:"Sumo Deadlift (Barbell)",cat:"Back"},
+  {name:"Superman",cat:"Back"},{name:"Swimming",cat:"Cardio"},{name:"T Bar Row",cat:"Back"},
+  {name:"Toes To Bar",cat:"Core"},{name:"Trap Bar Deadlift",cat:"Back"},{name:"Triceps Dip",cat:"Triceps"},
+  {name:"Triceps Extension",cat:"Triceps"},{name:"Triceps Extension (Barbell)",cat:"Triceps"},
+  {name:"Triceps Extension (Cable)",cat:"Triceps"},{name:"Triceps Extension (Dumbbell)",cat:"Triceps"},
+  {name:"Triceps Pushdown (Cable - Straight Bar)",cat:"Triceps"},{name:"Upright Row (Barbell)",cat:"Shoulders"},
+  {name:"V Up",cat:"Core"},{name:"Walking",cat:"Cardio"},{name:"Wide Pull Up",cat:"Back"},
   {name:"Yoga",cat:"Flexibility"},{name:"Zercher Squat (Barbell)",cat:"Legs"}
 ];
 
-const CATEGORIES=["Chest","Back","Shoulders","Biceps","Triceps","Legs","Glutes","Core","Cardio","Full Body","Flexibility","Other"];
+const CATEGORIES=["Chest","Back","Shoulders","Biceps","Triceps","Legs","Glutes","Core","Cardio","Full Body","Flexibility"];
 
 // ─── Supabase Init ────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://jbsyenvrbzubyjckggju.supabase.co';
@@ -507,7 +379,6 @@ async function handleLogout(){
   }catch(e){console.warn('signOut error',e);}
   sets=[];
   exercises=[];
-  exPrefs={};
   profile={name:'',age:'',weight:'',height:''};
   bwLogs=[];
   _currentUser=null;
@@ -517,26 +388,10 @@ async function handleLogout(){
 async function loadSetsCloud(){
   const{data,error}=await _sb.from('sets').select('*').eq('user_id',_currentUser.id);
   if(error){console.error('loadSets',error);return[];}
-  return(data||[]).map(r=>({
-    id:r.id,date:r.date,ex:r.exercise,w:r.weight,r:r.reps,note:r.note||'',
-    assisted:r.assisted_weight||null,
-    distance:r.distance||null,
-    duration_hours:r.duration_hours||null,
-    duration_minutes:r.duration_minutes||null,
-    duration_seconds:r.duration_seconds||null,
-    pace:r.pace||null
-  }));
+  return(data||[]).map(r=>({id:r.id,date:r.date,ex:r.exercise,w:r.weight,r:r.reps,note:r.note||''}));
 }
 async function saveSetCloud(s){
-  await _sb.from('sets').upsert({
-    id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:s.note||null,
-    assisted_weight:s.assisted||null,
-    distance:s.distance||null,
-    duration_hours:s.duration_hours||null,
-    duration_minutes:s.duration_minutes||null,
-    duration_seconds:s.duration_seconds||null,
-    pace:s.pace||null
-  },{onConflict:'id'});
+  await _sb.from('sets').upsert({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:s.note||null},{onConflict:'id'});
 }
 async function deleteSetCloud(id){
   await _sb.from('sets').delete().eq('id',id).eq('user_id',_currentUser.id);
@@ -607,24 +462,17 @@ async function migrateLocalStorageIfNeeded(){
 }
 
 // ─── Boot app after login ─────────────────────────────────────────────────────
-let sets=[];
-let exercises=[];
-let profile={name:'',age:'',weight:'',height:''};
-let bwLogs=[];
-let _booting=false;
 async function bootApp(user){
-  if(_booting||(_currentUser&&_currentUser.id===user.id))return;
-  _booting=true;
   _currentUser=user;
   document.getElementById('loginScreen').style.display='none';
   document.querySelector('.app').style.display='flex';
   toast('Loading your data…','#3b82f6');
   await migrateLocalStorageIfNeeded();
   const[cloudSets,cloudEx,cloudProfile]=await Promise.all([loadSetsCloud(),loadExercisesCloud(),loadProfileCloud()]);
-  await loadExPrefsCloud();
 
   // Seed exercises to cloud if none exist for this user
   if(!cloudEx||cloudEx.length===0){
+    // Use user-specific IDs so different users don't conflict
     const uid=user.id.replace(/-/g,'').slice(0,8);
     const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'ex_'+uid+'_'+i}));
     exercises=seedEx;
@@ -645,7 +493,6 @@ async function bootApp(user){
   }
 
   profile=cloudProfile;
-  _booting=false;
   toast('Ready! 💪');
   renderDashboard();
 }
@@ -653,10 +500,10 @@ async function bootApp(user){
 // ─── Auth state listener ──────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event,session)=>{
   if(event==='SIGNED_IN'&&session&&session.user){
-    if(!_booting&&!(_currentUser&&_currentUser.id===session.user.id))await bootApp(session.user);
+    await bootApp(session.user);
   } else if(event==='SIGNED_OUT'||!session){
     _currentUser=null;
-    sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};bwLogs=[];
+    sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};
     document.querySelector('.app').style.display='none';
     document.getElementById('loginScreen').style.display='flex';
     showLogin();
@@ -672,6 +519,9 @@ _sb.auth.onAuthStateChange(async(event,session)=>{
     document.getElementById('loginScreen').style.display='flex';
   }
 })();
+let sets=[];
+let exercises=[];
+let profile={name:'',age:'',weight:'',height:''};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function calc1RM(w,r){if(!w||!r)return null;return Math.round(w*(1+r/30)*10)/10;}
@@ -731,129 +581,33 @@ function renderDashboard(){
 
 // ─── Progress ─────────────────────────────────────────────────────────────────
 let selectedEx=null;
-function getCardioProgress(ex){
-  const byDate={};
-  sets.filter(s=>s.ex===ex&&s.distance).forEach(s=>{
-    if(!byDate[s.date]||s.distance>byDate[s.date].dist)byDate[s.date]={dist:s.distance,pace:s.pace};
-  });
-  return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),dist:byDate[d].dist,pace:byDate[d].pace}));
-}
-function getDurationProgress(ex){
-  const byDate={};
-  sets.filter(s=>s.ex===ex).forEach(s=>{
-    const totalMin=(s.duration_hours||0)*60+(s.duration_minutes||0)+(s.duration_seconds||0)/60;
-    if(totalMin>0&&(!byDate[s.date]||totalMin>byDate[s.date]))byDate[s.date]=totalMin;
-  });
-  return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),mins:Math.round(byDate[d]*10)/10}));
-}
-function getWeightProgress(ex){
-  const byDate={};
-  sets.filter(s=>s.ex===ex&&s.w).forEach(s=>{if(!byDate[s.date]||s.w>byDate[s.date])byDate[s.date]=s.w;});
-  return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),maxW:byDate[d]}));
-}
-function getExData(ex){
-  const byDate={};
-  sets.filter(s=>s.ex===ex).forEach(s=>{if(!byDate[s.date])byDate[s.date]=[];byDate[s.date].push(s);});
-  return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),vol:Math.round(byDate[d].filter(s=>s.w&&s.r).reduce((t,s)=>t+s.w*s.r,0))}));
-}
-
 function renderProgress(ex){
   const exNames=getExNames();
   if(!ex)ex=selectedEx||exNames[0];
   selectedEx=ex;
+  const wpData=getWeightProgress(ex);
+  const exData=getExData(ex);
   const allSetsEx=sets.filter(s=>s.ex===ex);
-  const fields=getExFields(ex);
-  const hasWeight=fields.includes('weight');
-  const hasCardio=fields.includes('distance');
-  const hasDuration=fields.includes('duration')&&!hasCardio;
-  const fieldLabel=fields.map(f=>{const fd=ALL_FIELDS.find(x=>x.id===f);return fd?fd.label:f;}).join(' · ');
-
-  let chartSection='';
-  let tableHtml='';
-
-  if(hasCardio){
-    const cData=getCardioProgress(ex);
-    if(cData.length>=2){
-      chartSection=`<div class="card fade-in"><div class="card-title">Distance per session</div><div class="card-sub">km</div><div class="chart-wrap"><canvas id="cardioDistChart"></canvas></div></div>
-      <div class="card fade-in"><div class="card-title">Pace</div><div class="card-sub">min/km — lower is faster</div><div class="chart-wrap"><canvas id="cardioPaceChart"></canvas></div></div>`;
-    } else {
-      chartSection=`<div class="card fade-in"><div style="text-align:center;padding:30px 0;color:var(--text2);font-size:13px;">Log 2+ sessions to see chart</div></div>`;
-    }
-    let rows='';
-    allSetsEx.forEach(s=>{
-      const time=[s.duration_hours?s.duration_hours+'h':'',s.duration_minutes?s.duration_minutes+'m':'',s.duration_seconds?s.duration_seconds+'s':''].filter(Boolean).join(' ')||'--';
-      rows+=`<tr><td style="padding:7px 0;border-bottom:0.5px solid var(--border);color:var(--text2);">${fmtDateShort(s.date)}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;font-weight:500;">${s.distance?s.distance+'km':'--'}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;">${s.pace?fmtPace(s.pace)+'/km':'--'}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;color:var(--text2);">${time}</td></tr>`;
-    });
-    tableHtml=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="color:var(--text2);"><th style="text-align:left;padding:0 0 10px;font-weight:500;">Date</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Dist</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Pace</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Time</th></tr></thead><tbody>${rows}</tbody></table>`;
-    setTimeout(()=>{
-      if(cData.length<2)return;
-      const dc=document.getElementById('cardioDistChart');
-      const pc=document.getElementById('cardioPaceChart');
-      if(dc)chartInstances['cardioDist']=new Chart(dc,{type:'bar',data:{labels:cData.map(d=>d.label),datasets:[{data:cData.map(d=>d.dist),backgroundColor:'#3b82f6',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'km'}}}}});
-      if(pc){const pd=cData.filter(d=>d.pace);if(pd.length>=2)chartInstances['cardioPace']=new Chart(pc,{type:'line',data:{labels:pd.map(d=>d.label),datasets:[{data:pd.map(d=>d.pace),borderColor:'#1DB954',backgroundColor:'rgba(29,185,84,0.08)',fill:true,tension:0.35,pointBackgroundColor:'#1DB954',pointRadius:5,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{reverse:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>fmtPace(v)}}}}});}
-    },50);
-  } else if(hasDuration){
-    const dData=getDurationProgress(ex);
-    if(dData.length>=2){
-      chartSection=`<div class="card fade-in"><div class="card-title">Duration per session</div><div class="card-sub">minutes</div><div class="chart-wrap"><canvas id="durChart"></canvas></div></div>`;
-    } else {
-      chartSection=`<div class="card fade-in"><div style="text-align:center;padding:30px 0;color:var(--text2);font-size:13px;">Log 2+ sessions to see chart</div></div>`;
-    }
-    let rows='';
-    allSetsEx.forEach(s=>{
-      const tot=Math.round(((s.duration_hours||0)*60+(s.duration_minutes||0)+(s.duration_seconds||0)/60)*10)/10;
-      rows+=`<tr><td style="padding:7px 0;border-bottom:0.5px solid var(--border);color:var(--text2);">${fmtDateShort(s.date)}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;font-weight:500;">${tot?tot+'min':'--'}</td></tr>`;
-    });
-    tableHtml=`<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="color:var(--text2);"><th style="text-align:left;padding:0 0 10px;font-weight:500;">Date</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Duration</th></tr></thead><tbody>${rows}</tbody></table>`;
-    setTimeout(()=>{
-      if(dData.length<2)return;
-      const dc=document.getElementById('durChart');
-      if(dc)chartInstances['dur']=new Chart(dc,{type:'bar',data:{labels:dData.map(d=>d.label),datasets:[{data:dData.map(d=>d.mins),backgroundColor:'#f59e0b',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'min'}}}}});
-    },50);
-  } else {
-    // weight / reps / assisted
-    const wpData=getWeightProgress(ex);
-    const exData=getExData(ex);
-    const allWts=allSetsEx.filter(s=>s.w).map(s=>s.w);
-    const maxWt=allWts.length?Math.max(...allWts):0;
-    if(wpData.length>=2){
-      chartSection=`<div class="card fade-in"><div class="card-title">Highest weight lifted</div><div class="card-sub">Best kg per session</div><div class="chart-wrap"><canvas id="wtChart"></canvas></div></div>
-      <div class="card fade-in"><div class="card-title">Volume per session</div><div class="card-sub">Total kg moved</div><div class="chart-wrap"><canvas id="volChart"></canvas></div></div>`;
-      setTimeout(()=>{
-        const wtCtx=document.getElementById('wtChart');const volCtx=document.getElementById('volChart');if(!wtCtx||!volCtx)return;
-        chartInstances['wt']=new Chart(wtCtx,{type:'line',data:{labels:wpData.map(d=>d.label),datasets:[{data:wpData.map(d=>d.maxW),borderColor:'#1DB954',backgroundColor:'rgba(29,185,84,0.08)',fill:true,tension:0.35,pointBackgroundColor:'#1DB954',pointRadius:5,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'kg'}}}}});
-        chartInstances['vol']=new Chart(volCtx,{type:'bar',data:{labels:exData.map(d=>d.label),datasets:[{data:exData.map(d=>d.vol),backgroundColor:'#3b82f6',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'kg'}}}}});
-      },50);
-    } else if(!hasWeight&&fields.includes('reps')){
-      // reps only (bodyweight)
-      const bwByDate={};
-      allSetsEx.filter(s=>s.r).forEach(s=>{if(!bwByDate[s.date]||s.r>bwByDate[s.date])bwByDate[s.date]=s.r;});
-      const bwData=Object.keys(bwByDate).sort().map(d=>({label:fmtDateShort(d),maxR:bwByDate[d]}));
-      if(bwData.length>=2){
-        chartSection=`<div class="card fade-in"><div class="card-title">Max reps per session</div><div class="chart-wrap"><canvas id="repsChart"></canvas></div></div>`;
-        setTimeout(()=>{const c=document.getElementById('repsChart');if(c)chartInstances['reps']=new Chart(c,{type:'line',data:{labels:bwData.map(d=>d.label),datasets:[{data:bwData.map(d=>d.maxR),borderColor:'#1DB954',backgroundColor:'rgba(29,185,84,0.08)',fill:true,tension:0.35,pointBackgroundColor:'#1DB954',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+' reps'}}}}});},50);
-      } else {
-        chartSection=`<div class="card fade-in"><div style="text-align:center;padding:30px 0;color:var(--text2);font-size:13px;">Log 2+ sessions to see chart</div></div>`;
-      }
-    } else {
-      chartSection=`<div class="card fade-in"><div style="text-align:center;padding:30px 0;color:var(--text2);font-size:13px;">Log 2+ sessions to see chart</div></div>`;
-    }
-    let rows='';let setNum={};
-    allSetsEx.forEach(s=>{
-      setNum[s.date]=(setNum[s.date]||0)+1;
-      const isPR=s.w&&s.w===maxWt;
-      rows+=`<tr><td style="padding:7px 0;border-bottom:0.5px solid var(--border);color:var(--text2);">${fmtDateShort(s.date)}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;color:var(--text2);">${setNum[s.date]}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;font-weight:500;">${fmtSetSummary(s)}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;">${isPR?'<span class="tag-badge tag-wt">PR</span>':''}</td></tr>`;
-    });
-    tableHtml=`<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:280px;"><thead><tr style="color:var(--text2);"><th style="text-align:left;padding:0 0 10px;font-weight:500;">Date</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">#</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Set</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Tag</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
+  const allWts=allSetsEx.filter(s=>s.w).map(s=>s.w);
+  const allVols=allSetsEx.filter(s=>s.w&&s.r).map(s=>s.w*s.r);
+  const maxWt=allWts.length?Math.max(...allWts):0;
+  const maxVol=allVols.length?Math.max(...allVols):0;
   document.getElementById('screen').innerHTML=`
-    <div class="page-header fade-in"><h1>Progress</h1><p>Track your improvements</p></div>
+    <div class="page-header fade-in"><h1>Progress</h1><p>Highest weight over time</p></div>
     <div class="ex-picker fade-in"><select id="exSelect" onchange="renderProgress(this.value)">${exNames.map(e=>`<option value="${e}" ${e===ex?'selected':''}>${e}</option>`).join('')}</select></div>
-    <div style="padding:0 20px 10px;font-size:11px;color:var(--text2);">Fields: <span style="color:var(--green);font-weight:600;">${fieldLabel}</span></div>
-    ${chartSection}
-    <div class="section-label">All Entries</div>
-    <div class="card fade-in" style="padding:12px 16px;overflow-x:auto;">${tableHtml}</div>`;
+    ${wpData.length<2?`<div class="card fade-in"><div class="card-title">${ex}</div><div style="text-align:center;padding:30px 0;color:var(--text2);font-size:13px;">Log at least 2 sessions to see chart</div></div>`:`
+    <div class="card fade-in"><div class="card-title">Highest weight lifted</div><div class="card-sub">Best kg per session</div><div class="chart-wrap"><canvas id="wtChart"></canvas></div></div>
+    <div class="card fade-in"><div class="card-title">Volume per session</div><div class="card-sub">Total kg moved</div><div class="chart-wrap"><canvas id="volChart"></canvas></div></div>`}
+    <div class="section-label">All Sets</div>
+    <div class="card fade-in" style="padding:12px 16px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:280px;">
+        <thead><tr style="color:var(--text2);"><th style="text-align:left;padding:0 0 10px;font-weight:500;">Date</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">#</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Weight</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Reps</th><th style="text-align:center;padding:0 0 10px;font-weight:500;">Tag</th></tr></thead>
+        <tbody id="setsBody"></tbody>
+      </table>
+    </div>`;
+  const tbody=document.getElementById('setsBody');
+  if(tbody){let setNum={};allSetsEx.forEach(s=>{setNum[s.date]=(setNum[s.date]||0)+1;let tag='';if(s.w===maxWt)tag='<span class="tag-badge tag-wt">WT PR</span>';else if(s.w&&s.r&&s.w*s.r===maxVol)tag='<span class="tag-badge tag-vol">VOL</span>';const tr=document.createElement('tr');tr.innerHTML=`<td style="padding:7px 0;border-bottom:0.5px solid var(--border);color:var(--text2);">${fmtDateShort(s.date)}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;color:var(--text2);">${setNum[s.date]}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;font-weight:500;">${s.w?s.w+'kg':'--'}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;">${s.r||'--'}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--border);text-align:center;">${tag}</td>`;tbody.appendChild(tr);});if(tbody.lastChild)tbody.lastChild.querySelectorAll('td').forEach(td=>td.style.borderBottom='none');}
+  if(wpData.length>=2){setTimeout(()=>{const wtCtx=document.getElementById('wtChart');const volCtx=document.getElementById('volChart');if(!wtCtx||!volCtx)return;chartInstances['wt']=new Chart(wtCtx,{type:'line',data:{labels:wpData.map(d=>d.label),datasets:[{data:wpData.map(d=>d.maxW),borderColor:'#1DB954',backgroundColor:'rgba(29,185,84,0.08)',fill:true,tension:0.35,pointBackgroundColor:'#1DB954',pointRadius:5,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'kg'}}}}});chartInstances['vol']=new Chart(volCtx,{type:'bar',data:{labels:exData.map(d=>d.label),datasets:[{data:exData.map(d=>d.vol),backgroundColor:'#3b82f6',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#666',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#666',font:{size:10},callback:v=>v+'kg'}}}}});},50);}
 }
 
 // ─── Calendar ─────────────────────────────────────────────────────────────────
@@ -884,7 +638,7 @@ function renderCalendar(){
       <button class="btn-cta" onclick="renderSessionEdit('${calSelected}','calendar')">Edit This Workout</button>
     </div>
     <div style="padding:0 16px;" class="fade-in">
-      ${selExs.map(ex=>{const exSets=selSets.filter(s=>s.ex===ex);return`<div class="detail-ex-name" style="padding:10px 0 6px;">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></div>${exSets.map((s,i)=>`<div class="detail-set-row"><span class="detail-set-num">#${i+1}</span><span class="detail-set-info">${fmtSetSummary(s)}</span><span class="detail-set-1rm">${getExType(s.ex)==='weighted'&&calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span></div>`).join('')}`;}).join('')}
+      ${selExs.map(ex=>{const exSets=selSets.filter(s=>s.ex===ex);return`<div class="detail-ex-name" style="padding:10px 0 6px;">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></div>${exSets.map((s,i)=>`<div class="detail-set-row"><span class="detail-set-num">Set ${i+1}</span><span class="detail-set-info">${s.w?s.w+'kg × '+s.r+' reps':s.r+' reps'}</span><span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span></div>`).join('')}`;}).join('')}
     </div>`}`;
 }
 function selectCalDay(date){calSelected=date;renderCalendar();}
@@ -931,33 +685,20 @@ function buildExBlock(ex,date,maxWtByEx){
   const exSets=sets.filter(s=>s.date===date&&s.ex===ex);
   const globalMax=maxWtByEx[ex]||0;
   const safeKey=ex.replace(/[^a-z0-9]/gi,'_');
-  const fields=getExFields(ex);
-
-  // Build add-entry bar based on saved fields
-  let addInputs='';
-  if(fields.includes('weight'))addInputs+=`<input type="number" placeholder="kg" step="0.5" min="0" inputmode="decimal" id="addW-${safeKey}" style="width:70px;">`;
-  if(fields.includes('assisted'))addInputs+=`<input type="number" placeholder="assist" step="0.5" min="0" inputmode="decimal" id="addA-${safeKey}" style="width:64px;">`;
-  if(fields.includes('reps'))addInputs+=`<input type="number" placeholder="reps" step="1" min="1" inputmode="numeric" id="addR-${safeKey}" style="width:64px;">`;
-  if(fields.includes('duration'))addInputs+=`<input type="number" placeholder="min" step="1" min="0" inputmode="numeric" id="addM-${safeKey}" style="width:52px;"><input type="number" placeholder="sec" step="1" min="0" max="59" inputmode="numeric" id="addS-${safeKey}" style="width:52px;">`;
-  if(fields.includes('distance'))addInputs+=`<input type="number" placeholder="km" step="0.01" min="0" inputmode="decimal" id="addD-${safeKey}" style="width:64px;">`;
-
   return`<div class="detail-ex-block">
     <div class="detail-ex-header"><span class="detail-ex-name">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></span></div>
-    ${exSets.map((s,i)=>{
-      const rm=s.w&&s.r?calc1RM(s.w,s.r)+'kg':'';
-      const isPR=s.w&&s.w===globalMax;
-      return`<div class="detail-set-row" id="setrow-${s.id}">
-        <span class="detail-set-num">#${i+1}</span>
-        <span class="detail-set-info">${fmtSetSummary(s)}</span>
-        <span class="detail-set-1rm">${rm}</span>
-        ${isPR?'<span class="tag-badge tag-wt">PR</span>':''}
-        <button class="icon-btn edit-btn" onclick="startEditSet('${s.id}')">✎</button>
-        <button class="icon-btn del-btn" onclick="deleteSetById('${s.id}')">✕</button>
-      </div>`;
-    }).join('')}
-    <div class="add-set-bar" style="flex-wrap:wrap;gap:6px;">
-      ${addInputs}
-      <button class="save-btn" onclick="addSetToSession('${ex}','${safeKey}')">+ Add</button>
+    ${exSets.map((s,i)=>`<div class="detail-set-row" id="setrow-${s.id}">
+      <span class="detail-set-num">Set ${i+1}</span>
+      <span class="detail-set-info">${s.w?s.w+'kg × '+s.r+' reps':s.r+' reps'}</span>
+      <span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span>
+      ${s.w&&s.w===globalMax?'<span class="tag-badge tag-wt">PR</span>':''}
+      <button class="icon-btn edit-btn" onclick="startEditSet('${s.id}')">✎</button>
+      <button class="icon-btn del-btn" onclick="deleteSetById('${s.id}')">✕</button>
+    </div>`).join('')}
+    <div class="add-set-bar">
+      <input type="number" placeholder="kg" step="0.5" min="0" inputmode="decimal" id="addW-${safeKey}">
+      <input type="number" placeholder="reps" step="1" min="1" inputmode="numeric" id="addR-${safeKey}">
+      <button class="save-btn" onclick="addSetToSession('${ex}','${safeKey}')">+ Set</button>
     </div>
   </div>`;
 }
@@ -965,41 +706,23 @@ function buildExBlock(ex,date,maxWtByEx){
 function startEditSet(id){
   const s=sets.find(x=>x.id===id);if(!s)return;
   const row=document.getElementById('setrow-'+id);if(!row)return;
-  const fields=getExFields(s.ex);
-  const INP2="background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;padding:6px 8px;outline:none;";
-  let inputs='';
-  if(fields.includes('weight'))inputs+=`<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">kg</span><input type="number" id="ew-${id}" value="${s.w||''}" placeholder="kg" step="0.5" inputmode="decimal" style="${INP2}width:70px;"></div>`;
-  if(fields.includes('assisted'))inputs+=`<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">assist</span><input type="number" id="ea-${id}" value="${s.assisted||''}" placeholder="kg" step="0.5" inputmode="decimal" style="${INP2}width:64px;"></div>`;
-  if(fields.includes('reps'))inputs+=`<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">reps</span><input type="number" id="er-${id}" value="${s.r||''}" placeholder="reps" step="1" inputmode="numeric" style="${INP2}width:64px;"></div>`;
-  if(fields.includes('duration'))inputs+=`<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">min</span><input type="number" id="em-${id}" value="${s.duration_minutes||''}" placeholder="m" step="1" inputmode="numeric" style="${INP2}width:52px;"></div><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">sec</span><input type="number" id="es-${id}" value="${s.duration_seconds||''}" placeholder="s" step="1" inputmode="numeric" style="${INP2}width:52px;"></div>`;
-  if(fields.includes('distance'))inputs+=`<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:10px;color:var(--text2);">km</span><input type="number" id="ed-${id}" value="${s.distance||''}" placeholder="km" step="0.01" inputmode="decimal" style="${INP2}width:64px;"></div>`;
-  row.outerHTML=`<div class="edit-set-row" id="editrow-${id}" style="flex-wrap:wrap;gap:8px;align-items:flex-end;">
-    ${inputs}
+  row.outerHTML=`<div class="edit-set-row" id="editrow-${id}">
+    <span style="font-size:12px;color:var(--text2);width:36px;flex-shrink:0;">Edit</span>
+    <input type="number" id="ew-${id}" value="${s.w||''}" placeholder="kg" step="0.5" inputmode="decimal">
+    <input type="number" id="er-${id}" value="${s.r||''}" placeholder="reps" step="1" inputmode="numeric">
     <button class="save-btn" onclick="saveEditSet('${id}')">Save</button>
-    <button class="cancel-btn" onclick="renderSessionEdit('${_editCtx.date}','${_editCtx.fromPage}')">✕</button>
+    <button class="cancel-btn" onclick="renderSessionEdit('${_editCtx.date}','${_editCtx.fromPage}')">Cancel</button>
   </div>`;
 }
 
 function saveEditSet(id){
+  const w=parseFloat(document.getElementById('ew-'+id).value)||null;
+  const r=parseInt(document.getElementById('er-'+id).value)||null;
+  if(!r){toast('Enter reps','#ef4444');return;}
   const s=sets.find(x=>x.id===id);if(!s)return;
-  const fields=getExFields(s.ex);
-  if(fields.includes('weight')){const v=parseFloat(document.getElementById('ew-'+id)?.value)||null;s.w=v;}
-  if(fields.includes('assisted')){const v=parseFloat(document.getElementById('ea-'+id)?.value)||null;s.assisted=v;}
-  if(fields.includes('reps')){const v=parseInt(document.getElementById('er-'+id)?.value)||null;s.r=v;}
-  if(fields.includes('duration')){
-    s.duration_minutes=parseInt(document.getElementById('em-'+id)?.value)||null;
-    s.duration_seconds=parseInt(document.getElementById('es-'+id)?.value)||null;
-  }
-  if(fields.includes('distance')){
-    s.distance=parseFloat(document.getElementById('ed-'+id)?.value)||null;
-    if(s.distance&&(s.duration_hours||s.duration_minutes||s.duration_seconds)){
-      s.pace=calcPace(s.distance,s.duration_hours,s.duration_minutes,s.duration_seconds);
-    }
-  }
-  saveSetCloud(s);toast('Updated ✓');
+  s.w=w;s.r=r;saveSetCloud(s);toast('Set updated');
   renderSessionEdit(_editCtx.date,_editCtx.fromPage);
 }
-
 
 function deleteSetById(id){
   sets=sets.filter(s=>s.id!==id);deleteSetCloud(id);toast('Set deleted');
@@ -1007,171 +730,56 @@ function deleteSetById(id){
 }
 
 function addSetToSession(ex,safeKey){
-  const fields=getExFields(ex);
-  let newSet={id:genId(),date:_editCtx.date,ex};
-  let hasData=false;
-  if(fields.includes('weight')){const v=parseFloat(document.getElementById('addW-'+safeKey)?.value)||null;if(v){newSet.w=v;hasData=true;}}
-  if(fields.includes('assisted')){const v=parseFloat(document.getElementById('addA-'+safeKey)?.value)||null;if(v){newSet.assisted=v;hasData=true;}}
-  if(fields.includes('reps')){const v=parseInt(document.getElementById('addR-'+safeKey)?.value)||null;if(v){newSet.r=v;hasData=true;}}
-  if(fields.includes('duration')){
-    const m=parseInt(document.getElementById('addM-'+safeKey)?.value)||null;
-    const s=parseInt(document.getElementById('addS-'+safeKey)?.value)||null;
-    if(m||s){newSet.duration_minutes=m;newSet.duration_seconds=s;hasData=true;}
-  }
-  if(fields.includes('distance')){const v=parseFloat(document.getElementById('addD-'+safeKey)?.value)||null;if(v){newSet.distance=v;hasData=true;}}
-  if(newSet.distance&&(newSet.duration_minutes||newSet.duration_seconds)){
-    newSet.pace=calcPace(newSet.distance,null,newSet.duration_minutes,newSet.duration_seconds);
-  }
-  if(!hasData){toast('Enter a value','#ef4444');return;}
-  sets.push(newSet);saveSetCloud(newSet);toast('Entry added');
+  const w=parseFloat(document.getElementById('addW-'+safeKey).value)||null;
+  const r=parseInt(document.getElementById('addR-'+safeKey).value)||null;
+  if(!r){toast('Enter reps','#ef4444');return;}
+  sets.push({id:genId(),date:_editCtx.date,ex,w,r});saveSetCloud(sets[sets.length-1]);toast('Set added');
   renderSessionEdit(_editCtx.date,_editCtx.fromPage);
 }
 
 function addExToSession(){
   const ex=document.getElementById('addExSelect').value;if(!ex)return;
-  // Create a minimal placeholder — no dummy r:0 for non-weighted types
-  const newSet={id:genId(),date:_editCtx.date,ex,w:null,r:null};
-  sets.push(newSet);saveSetCloud(newSet);
-  toast(`${ex} added — fill in the entry`);
-  renderSessionEdit(_editCtx.date,_editCtx.fromPage);
+  sets.push({id:genId(),date:_editCtx.date,ex,w:null,r:0});saveSetCloud(sets[sets.length-1]);
+  toast(`${ex} added — fill in sets`);renderSessionEdit(_editCtx.date,_editCtx.fromPage);
 }
 
 // ─── Log ──────────────────────────────────────────────────────────────────────
 let todaySets=[],logDate=todayStr();
-let _activeFields=[];
-
-const INP="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;";
-const SMALL="width:100%;padding:11px 10px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;";
-
-let _currentLogEx='';
-function buildFieldChips(exName,containerId){
-  const saved=getExFields(exName);
-  _activeFields=[...saved];
-  _currentLogEx=exName;
-  const el=document.getElementById(containerId);if(!el)return;
-  el.innerHTML=ALL_FIELDS.map(f=>{
-    const on=_activeFields.includes(f.id);
-    return`<div class="field-chip ${on?'active':''}" id="chip-${f.id}" onclick="toggleField('${f.id}')">${f.icon} ${f.label}</div>`;
-  }).join('');
-  renderFieldInputs('fieldInputs');
-}
-
-function toggleField(fieldId){
-  if(_activeFields.includes(fieldId)){
-    _activeFields=_activeFields.filter(f=>f!==fieldId);
-  } else {
-    _activeFields.push(fieldId);
-  }
-  ALL_FIELDS.forEach(f=>{
-    const chip=document.getElementById('chip-'+f.id);
-    if(chip)chip.classList.toggle('active',_activeFields.includes(f.id));
-  });
-  renderFieldInputs('fieldInputs');
-  if(_currentLogEx)saveExPrefCloud(_currentLogEx,_activeFields);
-}
-
-function renderFieldInputs(containerId){
-  const wrap=document.getElementById(containerId);if(!wrap)return;
-  let html='';
-  if(_activeFields.includes('weight')){
-    html+=`<div class="form-field"><label class="form-label">Weight (kg)</label><input type="number" id="logWeight" placeholder="0" min="0" step="0.5" inputmode="decimal" style="${INP}"></div>`;
-  }
-  if(_activeFields.includes('assisted')){
-    html+=`<div class="form-field"><label class="form-label">Assisted Weight (kg) <span style="color:var(--text3);font-size:10px;">machine takes away</span></label><input type="number" id="logAssisted" placeholder="0" min="0" step="0.5" inputmode="decimal" style="${INP}"></div>`;
-  }
-  if(_activeFields.includes('reps')){
-    html+=`<div class="form-field"><label class="form-label">Reps</label><input type="number" id="logReps" placeholder="0" min="1" step="1" inputmode="numeric" style="${INP}"></div>`;
-  }
-  if(_activeFields.includes('duration')){
-    html+=`<label class="form-label">Duration</label>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div><input type="number" id="logHours" placeholder="0" min="0" step="1" inputmode="numeric" style="${SMALL}" oninput="updatePacePreview()"><div style="font-size:10px;color:var(--text2);text-align:center;margin-top:3px;">hrs</div></div>
-      <div><input type="number" id="logMins" placeholder="0" min="0" max="59" step="1" inputmode="numeric" style="${SMALL}" oninput="updatePacePreview()"><div style="font-size:10px;color:var(--text2);text-align:center;margin-top:3px;">min</div></div>
-      <div><input type="number" id="logSecs" placeholder="0" min="0" max="59" step="1" inputmode="numeric" style="${SMALL}" oninput="updatePacePreview()"><div style="font-size:10px;color:var(--text2);text-align:center;margin-top:3px;">sec</div></div>
-    </div>`;
-  }
-  if(_activeFields.includes('distance')){
-    html+=`<div class="form-field"><label class="form-label">Distance (km)</label><input type="number" id="logDist" placeholder="5.0" min="0" step="0.01" inputmode="decimal" style="${INP}" oninput="updatePacePreview()"></div>`;
-  }
-  if(_activeFields.includes('distance')&&_activeFields.includes('duration')){
-    html+=`<div id="pacePreview" style="display:none;background:var(--green-dim);border:0.5px solid rgba(29,185,84,0.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--green);font-weight:600;text-align:center;"></div>`;
-  }
-  if(!_activeFields.length){
-    html=`<div style="text-align:center;padding:16px;color:var(--text3);font-size:13px;">Tap fields above to track</div>`;
-  }
-  wrap.innerHTML=html;
-}
-
-function updatePacePreview(){
-  const dist=parseFloat(document.getElementById('logDist')?.value)||0;
-  const h=parseInt(document.getElementById('logHours')?.value)||0;
-  const m=parseInt(document.getElementById('logMins')?.value)||0;
-  const s=parseInt(document.getElementById('logSecs')?.value)||0;
-  const box=document.getElementById('pacePreview');if(!box)return;
-  const pace=calcPace(dist,h,m,s);
-  if(pace&&dist){box.style.display='block';box.textContent='🏃 Pace: '+fmtPace(pace)+' /km';}
-  else{box.style.display='none';}
-}
-
 function renderLog(dateOverride){
   if(dateOverride)logDate=dateOverride;
   const isToday=logDate===todayStr();
   const exNames=getExNames();
   const selEl=document.getElementById('logEx');
-  const selEx=selEl?selEl.value:(exNames[0]||'');
-
-  let prevHint='';
-  const prevSets=sets.filter(s=>s.ex===selEx).sort((a,b)=>b.date.localeCompare(a.date));
-  if(prevSets.length){
-    const ps=prevSets[0];
-    prevHint=`<div class="prev-hint">Last: <span>${fmtSetSummary(ps)}</span> · ${fmtDateShort(ps.date)}</div>`;
-  }
-
+  const selEx=selEl?selEl.value:exNames[0];
+  const vol=Math.round(todaySets.reduce((t,s)=>t+(s.w&&s.r?s.w*s.r:0),0));
+  const prevSets=sets.filter(s=>s.ex===selEx&&s.w).sort((a,b)=>b.date.localeCompare(a.date));
+  const prevDate=prevSets.length?prevSets[0].date:null;
+  const prevMax=prevDate?Math.max(...sets.filter(s=>s.ex===selEx&&s.date===prevDate&&s.w).map(s=>s.w)):null;
   document.getElementById('screen').innerHTML=`
     <div class="page-header fade-in"><h1>Log Workout</h1><p>${isToday?'Today':fmtDate(logDate)}</p></div>
     ${!isToday?`<div class="date-badge fade-in">📅 Logging for ${fmtDate(logDate)}</div>`:''}
     <div class="log-wrap fade-in">
-      ${todaySets.length>0?`<div class="session-banner"><div class="session-banner-title">Session in progress</div><div class="session-banner-sub">${todaySets.length} entries logged</div></div>`:''}
-      <div class="form-field">
-        <label class="form-label">Exercise</label>
-        <select id="logEx" onchange="renderLog('${logDate}')">${exNames.map(e=>`<option value="${e}" ${e===selEx?'selected':''}>${e}</option>`).join('')}</select>
+      ${todaySets.length>0?`<div class="session-banner"><div class="session-banner-title">Session in progress</div><div class="session-banner-sub">${todaySets.length} sets · ${vol.toLocaleString()} kg</div></div>`:''}
+      <div class="form-field"><label class="form-label">Exercise</label><select id="logEx" onchange="renderLog('${logDate}')">${exNames.map(e=>`<option value="${e}" ${e===selEx?'selected':''}>${e}</option>`).join('')}</select></div>
+      ${prevMax?`<div class="prev-hint">Last session: <span>${prevMax}kg</span> on ${fmtDateShort(prevDate)}</div>`:''}
+      <div class="set-inputs">
+        <div class="form-field"><label class="form-label">Weight (kg)</label><input type="number" id="logWeight" placeholder="0" min="0" step="0.5" inputmode="decimal"></div>
+        <div class="form-field"><label class="form-label">Reps</label><input type="number" id="logReps" placeholder="0" min="1" step="1" inputmode="numeric"></div>
       </div>
-      ${prevHint}
-      <label class="form-label" style="margin-bottom:10px;display:block;">Track Fields <span style="color:var(--text3);font-size:10px;font-weight:400;">tap to toggle · auto-saved</span></label>
-      <div class="field-chips" id="fieldChips"></div>
-      <div id="fieldInputs"></div>
-      <button class="btn-primary" onclick="addSet()">Add Entry</button>
+      <button class="btn-primary" onclick="addSet()">Add Set</button>
       <button class="btn-secondary" onclick="showAddExerciseModal()">+ Add New Exercise</button>
       ${todaySets.length>0?`<button class="btn-danger" onclick="finishWorkout()">Finish & Save Workout</button>`:''}
     </div>
-    ${todaySets.length>0?`<div class="section-label">This Session</div><div style="padding:0 16px;">${todaySets.slice().reverse().map((s,ri)=>{const i=todaySets.length-1-ri;const rm=s.w&&s.r?calc1RM(s.w,s.r):null;return`<div class="logged-set fade-in"><div><div class="logged-set-info">Entry ${i+1} · ${fmtSetSummary(s)}</div><div class="logged-set-ex">${s.ex}</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="logged-set-1rm">${rm?rm+'kg 1RM':''}</span><button style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;font-size:18px;" onclick="removeLogSet(${i})">×</button></div></div>`;}).join('')}</div>`:`<div class="empty fade-in" style="margin-top:10px;"><div class="empty-icon">💪</div><p>Pick an exercise and start logging</p></div>`}`;
-
-  buildFieldChips(selEx,'fieldChips');
+    ${todaySets.length>0?`<div class="section-label">This Session</div><div style="padding:0 16px;">${todaySets.slice().reverse().map((s,ri)=>{const i=todaySets.length-1-ri;const rm=calc1RM(s.w,s.r);return`<div class="logged-set fade-in"><div><div class="logged-set-info">Set ${i+1} · ${s.w?s.w+'kg × '+s.r+'reps':s.r+' reps'}</div><div class="logged-set-ex">${s.ex}</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="logged-set-1rm">${rm?rm+'kg 1RM':''}</span><button style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;font-size:18px;" onclick="removeLogSet(${i})">×</button></div></div>`;}).join('')}</div>`:`<div class="empty fade-in" style="margin-top:10px;"><div class="empty-icon">💪</div><p>Pick an exercise and start logging</p></div>`}`;
 }
 
 function addSet(){
   const ex=document.getElementById('logEx').value;
-  if(!_activeFields.length){toast('Tap a field above to track','#ef4444');return;}
-  let setData={id:genId(),ex};
-  let hasData=false;
-  if(_activeFields.includes('weight')){const v=parseFloat(document.getElementById('logWeight')?.value)||null;if(v){setData.w=v;hasData=true;}}
-  if(_activeFields.includes('assisted')){const v=parseFloat(document.getElementById('logAssisted')?.value)||null;if(v){setData.assisted=v;hasData=true;}}
-  if(_activeFields.includes('reps')){const v=parseInt(document.getElementById('logReps')?.value)||null;if(v){setData.r=v;hasData=true;}}
-  if(_activeFields.includes('duration')){
-    const h=parseInt(document.getElementById('logHours')?.value)||null;
-    const m=parseInt(document.getElementById('logMins')?.value)||null;
-    const s=parseInt(document.getElementById('logSecs')?.value)||null;
-    if(h||m||s){setData.duration_hours=h;setData.duration_minutes=m;setData.duration_seconds=s;hasData=true;}
-  }
-  if(_activeFields.includes('distance')){const v=parseFloat(document.getElementById('logDist')?.value)||null;if(v){setData.distance=v;hasData=true;}}
-  if(setData.distance&&(setData.duration_hours||setData.duration_minutes||setData.duration_seconds)){
-    setData.pace=calcPace(setData.distance,setData.duration_hours,setData.duration_minutes,setData.duration_seconds);
-  }
-  if(!hasData){toast('Enter at least one value','#ef4444');return;}
-  todaySets.push(setData);
-  const rm=setData.w&&setData.r?calc1RM(setData.w,setData.r):null;
-  const paceStr=setData.pace?' · '+fmtPace(setData.pace)+'/km':'';
-  toast(rm?'Added · '+rm+'kg 1RM':'Entry added'+paceStr);
+  const w=parseFloat(document.getElementById('logWeight').value)||null;
+  const r=parseInt(document.getElementById('logReps').value)||null;
+  if(!r){toast('Enter reps to add set','#ef4444');return;}
+  todaySets.push({id:genId(),ex,w,r});
+  const rm=calc1RM(w,r);toast(rm?`Set added · ${rm}kg 1RM`:'Set added');
   renderLog(logDate);
 }
 function removeLogSet(i){todaySets.splice(i,1);renderLog(logDate);}
@@ -1182,7 +790,7 @@ function finishWorkout(){
   newSets.forEach(s=>saveSetCloud(s));
   todaySets=[];
   const wasToday=logDate===todayStr();logDate=todayStr();
-  toast('Workout saved! '+newSets.length+' sets');
+  toast(`Workout saved! ${newSets.length} sets`);
   navigate(wasToday?'history':'calendar');
 }
 
@@ -1243,13 +851,6 @@ function renderProfile(){
         <div class="form-field" style="margin:0;"><label class="form-label">Height (cm)</label><input type="number" id="pHeight" value="${p.height||''}" placeholder="175" inputmode="numeric" style="padding:11px 12px;font-size:14px;"></div>
       </div>
       <button class="btn-primary" style="margin-top:14px;" onclick="saveProfileData()">Save Profile</button>
-    </div>
-
-    <!-- Exercise Manager -->
-    <div class="section-label">Exercise Manager</div>
-    <div class="card fade-in">
-      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Rename exercises, change categories, and set default tracking fields per exercise.</p>
-      <button class="btn-cta" onclick="showExerciseManager()">Manage Exercises (${exercises.length})</button>
     </div>
 
     <!-- Body Weight Tracker -->
@@ -1401,6 +1002,7 @@ async function saveProfileData(){
 }
 
 // ─── Body Weight Tracker ──────────────────────────────────────────────────────
+let bwLogs=[];
 
 async function loadBWLogs(){
   const{data,error}=await _sb.from('bodyweight_log').select('*').eq('user_id',_currentUser.id).order('date',{ascending:true});
@@ -1771,159 +1373,6 @@ function calcWilks(showResult){
     <div style="font-size:11px;color:var(--text3);">Wilks Score · ${wilksGender==='male'?'Male':'Female'} · ${Math.round(bwKg*10)/10}kg</div>
     ${breakdown}
   </div>`;
-}
-
-
-// ─── Exercise Manager ─────────────────────────────────────────────────────────
-function showExerciseManager(){
-  const overlay=document.createElement('div');
-  overlay.className='modal-overlay';overlay.id='exMgrModal';
-  overlay.innerHTML=`<div class="modal" style="max-width:480px;width:100%;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h2 style="margin:0;">Manage Exercises</h2>
-      <button class="modal-close" onclick="closeModal('exMgrModal')">×</button>
-    </div>
-    <input class="ex-search" id="exMgrSearch" placeholder="Search exercises…" oninput="filterExMgr()" autofocus>
-    <div id="exMgrList"></div>
-  </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal('exMgrModal');});
-  renderExMgrList('');
-}
-
-function filterExMgr(){
-  const q=(document.getElementById('exMgrSearch')?.value||'').toLowerCase();
-  renderExMgrList(q);
-}
-
-function renderExMgrList(q){
-  const list=document.getElementById('exMgrList');if(!list)return;
-  const filtered=exercises.filter(e=>e.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
-  if(!filtered.length){list.innerHTML='<p style="font-size:13px;color:var(--text2);text-align:center;padding:20px 0;">No exercises found</p>';return;}
-  list.innerHTML=filtered.map(ex=>{
-    const fields=getExFields(ex.name);
-    const fl=fields.map(f=>{const fd=ALL_FIELDS.find(x=>x.id===f);return fd?fd.label:f;}).join(' · ');
-    const sc=sets.filter(s=>s.ex===ex.name).length;
-    // Use data attributes to avoid special chars breaking onclick
-    return`<div class="ex-mgr-row">
-      <div style="flex:1;min-width:0;">
-        <div class="ex-mgr-name">${ex.name}</div>
-        <div class="ex-mgr-cat">${ex.cat} · <span style="color:var(--text3);">${fl}</span></div>
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button class="icon-btn edit-btn" data-exid="${ex.id}" onclick="showEditExercise(this.dataset.exid)">✎</button>
-        <button class="icon-btn del-btn" data-exid="${ex.id}" data-sc="${sc}" onclick="confirmDeleteExercise(this.dataset.exid,exercises.find(e=>e.id===this.dataset.exid)?.name||'',parseInt(this.dataset.sc))">✕</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-let _editExCat=null;
-let _editExFields=null;
-
-let _editExId='';
-function showEditExercise(exId){
-  const ex=exercises.find(e=>e.id===exId);if(!ex)return;
-  _editExCat=null;_editExFields=null;_editExId=exId;
-  const currentFields=getExFields(ex.name);
-  const overlay=document.createElement('div');
-  overlay.className='modal-overlay';overlay.id='editExModal';
-  overlay.innerHTML=`<div class="modal" style="max-width:480px;width:100%;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <h2 style="margin:0;">Edit Exercise</h2>
-      <button class="modal-close" onclick="closeModal('editExModal')">×</button>
-    </div>
-    <div class="form-field">
-      <label class="form-label">Exercise Name</label>
-      <input type="text" id="editExName" value="${ex.name}" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;">
-    </div>
-    <label class="form-label" style="display:block;margin-bottom:10px;">Category</label>
-    <div class="cat-grid" id="editCatGrid">${CATEGORIES.map(c=>`<button class="cat-btn ${c===ex.cat?'selected':''}" onclick="selectEditCat('${c}',this)">${c}</button>`).join('')}</div>
-    <label class="form-label" style="display:block;margin-top:4px;margin-bottom:10px;">Default Fields <span style="color:var(--text3);font-size:10px;font-weight:400;">tap to toggle</span></label>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="editFieldChips">
-      ${ALL_FIELDS.map(f=>{
-        const on=currentFields.includes(f.id);
-        return`<div class="field-chip ${on?'active':''}" id="efchip-${f.id}" data-fid="${f.id}" onclick="toggleEditField(this.dataset.fid)">${f.icon} ${f.label}</div>`;
-      }).join('')}
-    </div>
-    <button class="btn-primary" onclick="saveEditExercise()">Save Changes</button>
-  </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal('editExModal');});
-}
-
-function selectEditCat(cat,btn){
-  _editExCat=cat;
-  document.querySelectorAll('#editCatGrid .cat-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-
-function toggleEditField(fieldId){
-  const ex=exercises.find(e=>e.id===_editExId);if(!ex)return;
-  if(!_editExFields){_editExFields=[...getExFields(ex.name)];}
-  if(_editExFields.includes(fieldId)){_editExFields=_editExFields.filter(f=>f!==fieldId);}
-  else{_editExFields.push(fieldId);}
-  const chip=document.getElementById('efchip-'+fieldId);
-  if(chip)chip.classList.toggle('active',_editExFields.includes(fieldId));
-}
-
-async function saveEditExercise(){
-  const exId=_editExId;
-  const ex=exercises.find(e=>e.id===exId);if(!ex)return;
-  const newName=(document.getElementById('editExName')?.value||'').trim();
-  if(!newName){toast('Enter exercise name','#ef4444');return;}
-  const newCat=_editExCat||ex.cat;
-  const finalFields=_editExFields||getExFields(ex.name);
-  if(newName!==ex.name&&exercises.find(e=>e.name.toLowerCase()===newName.toLowerCase())){
-    toast('Name already exists','#ef4444');return;
-  }
-  const oldName=ex.name;
-  ex.name=newName;ex.cat=newCat;
-  await saveOneExerciseCloud(ex);
-  if(oldName!==newName){
-    sets.filter(s=>s.ex===oldName).forEach(s=>{s.ex=newName;});
-    await Promise.all(sets.filter(s=>s.ex===newName).map(s=>saveSetCloud(s)));
-    if(exPrefs[oldName]){exPrefs[newName]=exPrefs[oldName];delete exPrefs[oldName];}
-  }
-  await saveExPrefCloud(newName,finalFields);
-  _editExCat=null;_editExFields=null;
-  closeModal('editExModal');
-  toast('Exercise updated ✓');
-  const q=(document.getElementById('exMgrSearch')?.value||'').toLowerCase();
-  renderExMgrList(q);
-}
-
-function confirmDeleteExercise(exId,exName,setCount){
-  const overlay=document.createElement('div');
-  overlay.className='modal-overlay';overlay.id='delExModal';
-  const warn=setCount>0?`<div style="background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--red);">⚠️ ${setCount} logged sets will also be deleted.</div>`:'';
-  overlay.innerHTML=`<div class="modal" style="max-width:480px;width:100%;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h2 style="margin:0;">Delete Exercise</h2>
-      <button class="modal-close" onclick="closeModal('delExModal')">×</button>
-    </div>
-    ${warn}
-    <p style="font-size:14px;margin-bottom:20px;">Delete <strong>${exName}</strong>?${setCount>0?' All '+setCount+' sets will be removed.':''}</p>
-    <button class="btn-danger" style="margin-top:0;" onclick="deleteExerciseConfirmed('${exId}')">Yes, Delete</button>
-    <button class="btn-secondary" onclick="closeModal('delExModal')">Cancel</button>
-  </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal('delExModal');});
-}
-
-async function deleteExerciseConfirmed(exId){
-  const ex=exercises.find(e=>e.id===exId);if(!ex)return;
-  const exName=ex.name;
-  const toDelete=sets.filter(s=>s.ex===exName);
-  sets=sets.filter(s=>s.ex!==exName);
-  await Promise.all(toDelete.map(s=>deleteSetCloud(s.id)));
-  exercises=exercises.filter(e=>e.id!==exId);
-  await _sb.from('exercises').delete().eq('id',exId).eq('user_id',_currentUser.id);
-  delete exPrefs[exName];
-  closeModal('delExModal');
-  toast('"'+exName+'" deleted');
-  const q=(document.getElementById('exMgrSearch')?.value||'').toLowerCase();
-  renderExMgrList(q);
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
