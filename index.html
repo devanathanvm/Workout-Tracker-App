@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f0f0f">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Workout Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -547,10 +550,13 @@ async function handleLogin(){
   const password=document.getElementById('authPassword').value||'';
   if(!email||!password){showAuthError('Please enter email and password.');return;}
   setBtnLoading('loginBtn',true,'Sign In');
+  // Clear any stale session before login
+  try{await _sb.auth.signOut();}catch(e){}
   const{error}=await _sb.auth.signInWithPassword({email,password});
   setBtnLoading('loginBtn',false,'Sign In');
   if(error){showAuthError(error.message);return;}
-  // onAuthStateChange will fire and boot the app
+  // Force reload to clear any WebView cache issues
+  window.location.reload();
 }
 
 async function handleSignup(){
@@ -573,6 +579,9 @@ async function handleLogout(){
     showLogin();
     await _sb.auth.signOut();
   }catch(e){console.warn('signOut error',e);}
+  // Clear all storage to prevent stale cache issues in WebView
+  try{localStorage.clear();}catch(e){}
+  try{sessionStorage.clear();}catch(e){}
   sets=[];
   exercises=[];
   profile={name:'',age:'',weight:'',height:''};
@@ -707,10 +716,26 @@ _sb.auth.onAuthStateChange(async(event,session)=>{
 
 // ─── Check existing session on page load ─────────────────────────────────────
 (async()=>{
-  const{data:{session}}=await _sb.auth.getSession();
-  if(session&&session.user){
-    await bootApp(session.user);
-  } else {
+  try{
+    // Try to refresh the session first to avoid stale token issues
+    const{data:{session},error}=await _sb.auth.getSession();
+    if(session&&session.user){
+      // Verify session is still valid by refreshing it
+      const{data:refreshed,error:refreshErr}=await _sb.auth.refreshSession();
+      if(refreshErr||!refreshed.session){
+        // Session invalid — clear everything and show login
+        try{localStorage.clear();}catch(e){}
+        try{sessionStorage.clear();}catch(e){}
+        await _sb.auth.signOut();
+        document.getElementById('loginScreen').style.display='flex';
+      } else {
+        await bootApp(refreshed.session.user);
+      }
+    } else {
+      document.getElementById('loginScreen').style.display='flex';
+    }
+  }catch(e){
+    console.warn('Session check error',e);
     document.getElementById('loginScreen').style.display='flex';
   }
 })();
