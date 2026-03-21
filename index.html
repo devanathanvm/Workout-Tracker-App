@@ -550,13 +550,15 @@ async function handleLogin(){
   const password=document.getElementById('authPassword').value||'';
   if(!email||!password){showAuthError('Please enter email and password.');return;}
   setBtnLoading('loginBtn',true,'Sign In');
-  // Clear any stale session before login
+  // Clear any stale session before fresh login
   try{await _sb.auth.signOut();}catch(e){}
-  const{error}=await _sb.auth.signInWithPassword({email,password});
+  const{data,error}=await _sb.auth.signInWithPassword({email,password});
   setBtnLoading('loginBtn',false,'Sign In');
   if(error){showAuthError(error.message);return;}
-  // Force reload to clear any WebView cache issues
-  window.location.reload();
+  // Directly boot app with fresh session — no reload needed
+  if(data?.session?.user){
+    await bootApp(data.session.user);
+  }
 }
 
 async function handleSignup(){
@@ -667,50 +669,78 @@ async function migrateLocalStorageIfNeeded(){
 
 // ─── Boot app after login ─────────────────────────────────────────────────────
 async function bootApp(user){
+  if(!user){console.error('bootApp called with no user');return;}
   _currentUser=user;
   document.getElementById('loginScreen').style.display='none';
   document.querySelector('.app').style.display='flex';
-  toast('Loading your data…','#3b82f6');
-  await migrateLocalStorageIfNeeded();
-  const[cloudSets,cloudEx,cloudProfile]=await Promise.all([loadSetsCloud(),loadExercisesCloud(),loadProfileCloud()]);
 
-  // Seed exercises to cloud if none exist for this user
-  if(!cloudEx||cloudEx.length===0){
-    // Use user-specific IDs so different users don't conflict
-    const uid=user.id.replace(/-/g,'').slice(0,8);
-    const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'ex_'+uid+'_'+i}));
-    exercises=seedEx;
-    await saveExercisesCloud(seedEx);
-  } else {
-    exercises=cloudEx;
+  // Show loading screen while data loads
+  document.getElementById('screen').innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;gap:16px;">
+      <div style="font-size:36px;">💪</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);">Loading your workouts…</div>
+      <div style="font-size:13px;color:var(--text2);">Syncing from cloud</div>
+    </div>`;
+
+  try{
+    await migrateLocalStorageIfNeeded();
+    const[cloudSets,cloudEx,cloudProfile]=await Promise.all([
+      loadSetsCloud(),
+      loadExercisesCloud(),
+      loadProfileCloud()
+    ]);
+
+    // Exercises
+    if(!cloudEx||cloudEx.length===0){
+      const uid=user.id.replace(/-/g,'').slice(0,8);
+      const seedEx=JSON.parse(JSON.stringify(SEED_EXERCISES)).map((e,i)=>({...e,id:'ex_'+uid+'_'+i}));
+      exercises=seedEx;
+      await saveExercisesCloud(seedEx);
+    } else {
+      exercises=cloudEx;
+    }
+
+    // Sets
+    if(cloudSets.length===0){
+      const uid=user.id.replace(/-/g,'').slice(0,8);
+      const seedSets=JSON.parse(JSON.stringify(SEED_SETS)).map((s,i)=>({...s,id:'set_'+uid+'_'+i}));
+      sets=seedSets;
+      const rows=seedSets.map(s=>({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:null}));
+      await _sb.from('sets').insert(rows);
+    } else {
+      sets=cloudSets;
+    }
+
+    profile=cloudProfile;
+    renderDashboard();
+    toast('Ready! 💪');
+  }catch(err){
+    console.error('bootApp error:',err);
+    // Show error with retry button instead of blank screen
+    document.getElementById('screen').innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;gap:16px;padding:24px;">
+        <div style="font-size:36px;">⚠️</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);text-align:center;">Could not load your data</div>
+        <div style="font-size:13px;color:var(--text2);text-align:center;">Check your internet connection and try again</div>
+        <button class="btn-primary" style="max-width:200px;" onclick="bootApp(_currentUser)">Retry</button>
+        <button class="btn-secondary" style="max-width:200px;" onclick="handleLogout()">Sign Out</button>
+      </div>`;
   }
-
-  // Seed sets to cloud if none exist for this user
-  if(cloudSets.length===0){
-    const uid=user.id.replace(/-/g,'').slice(0,8);
-    const seedSets=JSON.parse(JSON.stringify(SEED_SETS)).map((s,i)=>({...s,id:'set_'+uid+'_'+i}));
-    sets=seedSets;
-    const rows=seedSets.map(s=>({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:null}));
-    await _sb.from('sets').insert(rows);
-  } else {
-    sets=cloudSets;
-  }
-
-  profile=cloudProfile;
-  toast('Ready! 💪');
-  renderDashboard();
 }
 
 // ─── Auth state listener ──────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&session&&session.user){
-    await bootApp(session.user);
-  } else if(event==='SIGNED_OUT'||!session){
+  // Only handle TOKEN_REFRESHED to keep session alive
+  // SIGNED_IN is handled directly by handleLogin and page load check
+  if(event==='SIGNED_OUT'){
     _currentUser=null;
     sets=[];exercises=[];profile={name:'',age:'',weight:'',height:''};
     document.querySelector('.app').style.display='none';
     document.getElementById('loginScreen').style.display='flex';
     showLogin();
+  } else if(event==='TOKEN_REFRESHED'&&session&&session.user&&_currentUser){
+    // Silently update current user token
+    _currentUser=session.user;
   }
 });
 
