@@ -16,7 +16,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
 .app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;}
-.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px;scrollbar-width:none;width:100%;}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:100px;scrollbar-width:none;width:100%;}
 .screen::-webkit-scrollbar{display:none;}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(15,15,15,0.96);backdrop-filter:blur(20px);border-top:0.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;border:none;background:none;color:var(--text3);cursor:pointer;transition:color 0.15s;font-family:'DM Sans',sans-serif;}
@@ -889,7 +889,7 @@ function renderCalendar(){
       <div style="display:flex;justify-content:space-between;margin-bottom:14px;"><span style="font-size:13px;font-weight:600;">Sets</span><span style="font-size:13px;color:var(--text2);">${selSets.length}</span></div>
       <button class="btn-cta" onclick="renderSessionEdit('${calSelected}','calendar')">Edit This Workout</button>
     </div>
-    <div style="padding:0 16px;" class="fade-in">
+    <div style="padding:0 16px;padding-bottom:20px;" class="fade-in">
       ${selExs.map(ex=>{const exSets=selSets.filter(s=>s.ex===ex);return`<div class="detail-ex-name" style="padding:10px 0 6px;">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></div>${exSets.map((s,i)=>`<div class="detail-set-row"><span class="detail-set-num">Set ${i+1}</span><span class="detail-set-info">${fmtSetDisplay(s)}</span><span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span></div>`).join('')}`;}).join('')}
     </div>`}`;
 }
