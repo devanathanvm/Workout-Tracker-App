@@ -265,69 +265,265 @@ const SEED_SETS=[
   {id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:15,r:9},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:17.5,r:8},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:20,r:9},{id:genId(),date:"2026-03-17",ex:"Overhead Press (Dumbbell)",w:25,r:3}
 ];
 
-const SEED_EXERCISES=[
-  {name:"Ab Wheel",cat:"Core"},{name:"Aerobics",cat:"Cardio"},{name:"Arnold Press (Dumbbell)",cat:"Shoulders"},
-  {name:"Back Extension",cat:"Back"},{name:"Ball Slams",cat:"Full Body"},{name:"Battle Ropes",cat:"Cardio"},
-  {name:"Bench Dip",cat:"Triceps"},{name:"Bench Press (Barbell)",cat:"Chest"},{name:"Bench Press (Dumbbell)",cat:"Chest"},
-  {name:"Bench Press (Cable)",cat:"Chest"},{name:"Bench Press (Smith Machine)",cat:"Chest"},
-  {name:"Bent Over One Arm Row (Dumbbell)",cat:"Back"},{name:"Bent Over Row (Barbell)",cat:"Back"},
-  {name:"Bent Over Row (Dumbbell)",cat:"Back"},{name:"Bicep Curl (Barbell)",cat:"Biceps"},
-  {name:"Bicep Curl (Cable)",cat:"Biceps"},{name:"Bicep Curl (Dumbbell)",cat:"Biceps"},
-  {name:"Bicep Curl (Machine)",cat:"Biceps"},{name:"Box Jump",cat:"Legs"},{name:"Box Squat (Barbell)",cat:"Legs"},
-  {name:"Bulgarian Split Squat",cat:"Legs"},{name:"Burpee",cat:"Full Body"},{name:"Cable Crunch",cat:"Core"},
-  {name:"Cable Crossover",cat:"Chest"},{name:"Calf Press on Leg Press",cat:"Legs"},{name:"Chest Dip",cat:"Chest"},
-  {name:"Chest Fly",cat:"Chest"},{name:"Chest Fly (Dumbbell)",cat:"Chest"},{name:"Chest Press (Machine)",cat:"Chest"},
-  {name:"Chin Up",cat:"Back"},{name:"Clean (Barbell)",cat:"Full Body"},{name:"Concentration Curl (Dumbbell)",cat:"Biceps"},
-  {name:"Crunch",cat:"Core"},{name:"Deadlift (Barbell)",cat:"Back"},{name:"Deadlift (Dumbbell)",cat:"Back"},
-  {name:"Decline Bench Press (Barbell)",cat:"Chest"},{name:"Decline Crunch",cat:"Core"},
-  {name:"Elliptical Machine",cat:"Cardio"},{name:"Face Pull (Cable)",cat:"Shoulders"},
-  {name:"Farmer's Carry",cat:"Full Body"},
-  {name:"Front Raise (Dumbbell)",cat:"Shoulders"},{name:"Front Squat (Barbell)",cat:"Legs"},
-  {name:"Glute Ham Raise",cat:"Legs"},{name:"Goblet Squat (Kettlebell)",cat:"Legs"},
-  {name:"Good Morning (Barbell)",cat:"Back"},{name:"Hack Squat",cat:"Legs"},
-  {name:"Hammer Curl (Dumbbell)",cat:"Biceps"},{name:"Hanging Knee Raise",cat:"Core"},
-  {name:"Hanging Leg Raise",cat:"Core"},{name:"Hip Thrust (Barbell)",cat:"Glutes"},
-  {name:"Incline Bench Press (Barbell)",cat:"Chest"},{name:"Incline Bench Press (Dumbbell)",cat:"Chest"},
-  {name:"Incline Chest Fly (Dumbbell)",cat:"Chest"},{name:"Jump Rope",cat:"Cardio"},
-  {name:"Jump Squat",cat:"Legs"},{name:"Kettlebell Swing",cat:"Full Body"},
-  {name:"Knee Raise (Captain's Chair)",cat:"Core"},{name:"Lat Pulldown (Cable)",cat:"Back"},
-  {name:"Lat Pulldown (Machine)",cat:"Back"},{name:"Lateral Raise (Dumbbell)",cat:"Shoulders"},
-  {name:"Lateral Raise (Cable)",cat:"Shoulders"},{name:"Leg Extension (Machine)",cat:"Legs"},
-  {name:"Lunge (Barbell)",cat:"Legs"},{name:"Lunge (Bodyweight)",cat:"Legs"},{name:"Lunge (Dumbbell)",cat:"Legs"},
-  {name:"Lying Leg Curl (Machine)",cat:"Legs"},{name:"Mountain Climber",cat:"Core"},
-  {name:"Muscle Up",cat:"Back"},{name:"Overhead Press (Barbell)",cat:"Shoulders"},
-  {name:"Overhead Press (Dumbbell)",cat:"Shoulders"},{name:"Pec Deck (Machine)",cat:"Chest"},
-  {name:"Pendlay Row (Barbell)",cat:"Back"},{name:"Pistol Squat",cat:"Legs"},{name:"Plank",cat:"Core"},
-  {name:"Power Clean",cat:"Full Body"},{name:"Preacher Curl (Barbell)",cat:"Biceps"},
-  {name:"Preacher Curl (Dumbbell)",cat:"Biceps"},{name:"Pull Up",cat:"Back"},
-  {name:"Pullover (Dumbbell)",cat:"Back"},{name:"Push Press",cat:"Shoulders"},
-  {name:"Push Up",cat:"Chest"},{name:"Rack Pull (Barbell)",cat:"Back"},
-  {name:"Reverse Crunch",cat:"Core"},{name:"Reverse Curl (Barbell)",cat:"Biceps"},
-  {name:"Reverse Curl (Dumbbell)",cat:"Biceps"},{name:"Reverse Fly (Dumbbell)",cat:"Shoulders"},
-  {name:"Romanian Deadlift (Barbell)",cat:"Back"},{name:"Romanian Deadlift (Dumbbell)",cat:"Back"},
-  {name:"Rowing (Machine)",cat:"Cardio"},{name:"Running",cat:"Cardio"},{name:"Russian Twist",cat:"Core"},
-  {name:"Seated Calf Raise (Machine)",cat:"Legs"},{name:"Seated Leg Curl (Machine)",cat:"Legs"},
-  {name:"Seated Leg Press (Machine)",cat:"Legs"},{name:"Seated Overhead Press (Barbell)",cat:"Shoulders"},
-  {name:"Seated Overhead Press (Dumbbell)",cat:"Shoulders"},{name:"Seated Row (Cable)",cat:"Back"},
-  {name:"Seated Row (Machine)",cat:"Back"},{name:"Shoulder Press (Machine)",cat:"Shoulders"},
-  {name:"Shrug (Barbell)",cat:"Shoulders"},{name:"Shrug (Dumbbell)",cat:"Shoulders"},
-  {name:"Side Plank",cat:"Core"},{name:"Sit Up",cat:"Core"},{name:"Skullcrusher (Barbell)",cat:"Triceps"},
-  {name:"Skullcrusher (Dumbbell)",cat:"Triceps"},{name:"Squat (Barbell)",cat:"Legs"},
-  {name:"Squat (Bodyweight)",cat:"Legs"},{name:"Squat (Dumbbell)",cat:"Legs"},
-  {name:"Squat (Machine)",cat:"Legs"},{name:"Standing Calf Raise (Barbell)",cat:"Legs"},
-  {name:"Standing Calf Raise (Bodyweight)",cat:"Legs"},{name:"Standing Calf Raise (Dumbbell)",cat:"Legs"},
-  {name:"Standing Calf Raise (Machine)",cat:"Legs"},{name:"Step-up",cat:"Legs"},
-  {name:"Stiff Leg Deadlift (Barbell)",cat:"Back"},{name:"Sumo Deadlift (Barbell)",cat:"Back"},
-  {name:"Superman",cat:"Back"},{name:"Swimming",cat:"Cardio"},{name:"T Bar Row",cat:"Back"},
-  {name:"Toes To Bar",cat:"Core"},{name:"Trap Bar Deadlift",cat:"Back"},{name:"Triceps Dip",cat:"Triceps"},
-  {name:"Triceps Extension",cat:"Triceps"},{name:"Triceps Extension (Barbell)",cat:"Triceps"},
-  {name:"Triceps Extension (Cable)",cat:"Triceps"},{name:"Triceps Extension (Dumbbell)",cat:"Triceps"},
-  {name:"Triceps Pushdown (Cable - Straight Bar)",cat:"Triceps"},{name:"Upright Row (Barbell)",cat:"Shoulders"},
-  {name:"V Up",cat:"Core"},{name:"Walking",cat:"Cardio"},{name:"Wide Pull Up",cat:"Back"},
-  {name:"Yoga",cat:"Flexibility"},{name:"Zercher Squat (Barbell)",cat:"Legs"}
-];
+// Equipment types (Strong app style)
+const EQUIPMENT_TYPES=["Barbell","Dumbbell","Machine","Bodyweight","Cable","Band","Kettlebell","Plate","Smith Machine","Other"];
+const BODY_PARTS=["Arms","Back","Chest","Core","Full Body","Glutes","Legs","Olympic","Shoulders","Cardio","Other"];
 
-const CATEGORIES=["Chest","Back","Shoulders","Biceps","Triceps","Legs","Glutes","Core","Cardio","Full Body","Flexibility"];
+const SEED_EXERCISES=[
+  {name:"Ab Wheel",body_part:"Core",equipment:"Other",type:"bodyweight"},
+  {name:"Bicycle Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Cable Crunch",body_part:"Core",equipment:"Cable",type:"weighted"},
+  {name:"Cable Twist",body_part:"Core",equipment:"Cable",type:"weighted"},
+  {name:"Cross Body Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Crunch (Machine)",body_part:"Core",equipment:"Machine",type:"weighted"},
+  {name:"Crunch (Stability Ball)",body_part:"Core",equipment:"Other",type:"bodyweight"},
+  {name:"Decline Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Flat Knee Raise",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Flat Leg Raise",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Hanging Knee Raise",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Hanging Leg Raise",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Jackknife Sit Up",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Knee Raise (Captain's Chair)",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Knees to Elbows",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Mountain Climber",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Oblique Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Plank",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Reverse Crunch",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Reverse Plank",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Russian Twist",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Side Bend (Band)",body_part:"Core",equipment:"Band",type:"weighted"},
+  {name:"Side Bend (Cable)",body_part:"Core",equipment:"Cable",type:"weighted"},
+  {name:"Side Bend (Dumbbell)",body_part:"Core",equipment:"Dumbbell",type:"weighted"},
+  {name:"Side Plank",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Sit Up",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Toes To Bar",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Torso Rotation (Machine)",body_part:"Core",equipment:"Machine",type:"weighted"},
+  {name:"V Up",body_part:"Core",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Bench Press (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Bench Press - Close Grip (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Bench Press - Wide Grip (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Bench Press (Dumbbell)",body_part:"Chest",equipment:"Dumbbell",type:"weighted"},
+  {name:"Bench Press (Cable)",body_part:"Chest",equipment:"Cable",type:"weighted"},
+  {name:"Bench Press (Smith Machine)",body_part:"Chest",equipment:"Smith Machine",type:"weighted"},
+  {name:"Cable Crossover",body_part:"Chest",equipment:"Cable",type:"weighted"},
+  {name:"Chest Dip",body_part:"Chest",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Chest Dip (Assisted)",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Chest Fly",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Chest Fly (Band)",body_part:"Chest",equipment:"Band",type:"weighted"},
+  {name:"Chest Fly (Dumbbell)",body_part:"Chest",equipment:"Dumbbell",type:"weighted"},
+  {name:"Chest Press (Band)",body_part:"Chest",equipment:"Band",type:"weighted"},
+  {name:"Chest Press (Machine)",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Decline Bench Press (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Decline Bench Press (Dumbbell)",body_part:"Chest",equipment:"Dumbbell",type:"weighted"},
+  {name:"Decline Bench Press (Smith Machine)",body_part:"Chest",equipment:"Smith Machine",type:"weighted"},
+  {name:"Floor Press (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Incline Bench Press (Barbell)",body_part:"Chest",equipment:"Barbell",type:"weighted"},
+  {name:"Incline Bench Press (Cable)",body_part:"Chest",equipment:"Cable",type:"weighted"},
+  {name:"Incline Bench Press (Dumbbell)",body_part:"Chest",equipment:"Dumbbell",type:"weighted"},
+  {name:"Incline Bench Press (Smith Machine)",body_part:"Chest",equipment:"Smith Machine",type:"weighted"},
+  {name:"Incline Chest Fly (Dumbbell)",body_part:"Chest",equipment:"Dumbbell",type:"weighted"},
+  {name:"Incline Chest Press (Machine)",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Iso-Lateral Chest Press (Machine)",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Pec Deck (Machine)",body_part:"Chest",equipment:"Machine",type:"weighted"},
+  {name:"Push Up",body_part:"Chest",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Push Up (Band)",body_part:"Chest",equipment:"Band",type:"weighted"},
+  {name:"Push Up (Knees)",body_part:"Chest",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Back Extension",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Back Extension (Machine)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Bent Over Row (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Bent Over Row - Underhand (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Bent Over Row (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Bent Over Row (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Bent Over One Arm Row (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Chin Up",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Chin Up (Assisted)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Deadlift (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Deadlift (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Deadlift (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Deadlift (Smith Machine)",body_part:"Back",equipment:"Smith Machine",type:"weighted"},
+  {name:"Deficit Deadlift (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Good Morning (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Incline Row (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Inverted Row (Bodyweight)",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Iso-Lateral Row (Machine)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Kneeling Pulldown (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Lat Pulldown (Cable)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Lat Pulldown - Underhand (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Lat Pulldown - Underhand (Cable)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Lat Pulldown - Wide Grip (Cable)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Lat Pulldown (Machine)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Lat Pulldown (Single Arm)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Muscle Up",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Pendlay Row (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Pull Up",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Pull Up (Assisted)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Pull Up (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Pullover (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Pullover (Machine)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Rack Pull (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Romanian Deadlift (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Romanian Deadlift (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Seated Row (Cable)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Seated Row (Machine)",body_part:"Back",equipment:"Machine",type:"weighted"},
+  {name:"Seated Wide-Grip Row (Cable)",body_part:"Back",equipment:"Cable",type:"weighted"},
+  {name:"Stiff Leg Deadlift (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Stiff Leg Deadlift (Dumbbell)",body_part:"Back",equipment:"Dumbbell",type:"weighted"},
+  {name:"Straight Leg Deadlift (Band)",body_part:"Back",equipment:"Band",type:"weighted"},
+  {name:"Sumo Deadlift (Barbell)",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Superman",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"T Bar Row",body_part:"Back",equipment:"Barbell",type:"weighted"},
+  {name:"Trap Bar Deadlift",body_part:"Back",equipment:"Other",type:"weighted"},
+  {name:"Wide Pull Up",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Kipping Pull Up",body_part:"Back",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Arnold Press (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Around the World",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Face Pull (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Front Raise (Band)",body_part:"Shoulders",equipment:"Band",type:"weighted"},
+  {name:"Front Raise (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Front Raise (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Front Raise (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Front Raise (Plate)",body_part:"Shoulders",equipment:"Plate",type:"weighted"},
+  {name:"Handstand Push Up",body_part:"Shoulders",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Lateral Raise (Band)",body_part:"Shoulders",equipment:"Band",type:"weighted"},
+  {name:"Lateral Raise (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Lateral Raise (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Lateral Raise (Machine)",body_part:"Shoulders",equipment:"Machine",type:"weighted"},
+  {name:"Overhead Press (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Overhead Press (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Overhead Press (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Overhead Press (Smith Machine)",body_part:"Shoulders",equipment:"Smith Machine",type:"weighted"},
+  {name:"Push Press",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Reverse Fly (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Reverse Fly (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Reverse Fly (Machine)",body_part:"Shoulders",equipment:"Machine",type:"weighted"},
+  {name:"Seated Overhead Press (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Seated Overhead Press (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Shoulder Press (Machine)",body_part:"Shoulders",equipment:"Machine",type:"weighted"},
+  {name:"Shoulder Press (Plate Loaded)",body_part:"Shoulders",equipment:"Plate",type:"weighted"},
+  {name:"Shrug (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Shrug (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Shrug (Machine)",body_part:"Shoulders",equipment:"Machine",type:"weighted"},
+  {name:"Shrug (Smith Machine)",body_part:"Shoulders",equipment:"Smith Machine",type:"weighted"},
+  {name:"Strict Military Press (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Upright Row (Barbell)",body_part:"Shoulders",equipment:"Barbell",type:"weighted"},
+  {name:"Upright Row (Cable)",body_part:"Shoulders",equipment:"Cable",type:"weighted"},
+  {name:"Upright Row (Dumbbell)",body_part:"Shoulders",equipment:"Dumbbell",type:"weighted"},
+  {name:"Bench Dip",body_part:"Arms",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Bicep Curl (Barbell)",body_part:"Arms",equipment:"Barbell",type:"weighted"},
+  {name:"Bicep Curl (Cable)",body_part:"Arms",equipment:"Cable",type:"weighted"},
+  {name:"Bicep Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Bicep Curl (Machine)",body_part:"Arms",equipment:"Machine",type:"weighted"},
+  {name:"Concentration Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Hammer Curl (Band)",body_part:"Arms",equipment:"Band",type:"weighted"},
+  {name:"Hammer Curl (Cable)",body_part:"Arms",equipment:"Cable",type:"weighted"},
+  {name:"Hammer Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Incline Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Preacher Curl (Barbell)",body_part:"Arms",equipment:"Barbell",type:"weighted"},
+  {name:"Preacher Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Preacher Curl (Machine)",body_part:"Arms",equipment:"Machine",type:"weighted"},
+  {name:"Reverse Curl (Band)",body_part:"Arms",equipment:"Band",type:"weighted"},
+  {name:"Reverse Curl (Barbell)",body_part:"Arms",equipment:"Barbell",type:"weighted"},
+  {name:"Reverse Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Reverse Grip Concentration Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Seated Palms Up Wrist Curl (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Skullcrusher (Barbell)",body_part:"Arms",equipment:"Barbell",type:"weighted"},
+  {name:"Skullcrusher (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Triceps Dip",body_part:"Arms",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Triceps Dip (Assisted)",body_part:"Arms",equipment:"Machine",type:"weighted"},
+  {name:"Triceps Extension",body_part:"Arms",equipment:"Cable",type:"weighted"},
+  {name:"Triceps Extension (Barbell)",body_part:"Arms",equipment:"Barbell",type:"weighted"},
+  {name:"Triceps Extension (Cable)",body_part:"Arms",equipment:"Cable",type:"weighted"},
+  {name:"Triceps Extension (Dumbbell)",body_part:"Arms",equipment:"Dumbbell",type:"weighted"},
+  {name:"Triceps Extension (Machine)",body_part:"Arms",equipment:"Machine",type:"weighted"},
+  {name:"Triceps Pushdown (Cable - Straight Bar)",body_part:"Arms",equipment:"Cable",type:"weighted"},
+  {name:"Wrist Roller",body_part:"Arms",equipment:"Other",type:"weighted"},
+  {name:"Box Jump",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Box Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Bulgarian Split Squat",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Calf Press on Leg Press",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Calf Press on Seated Leg Press",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Front Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Glute Ham Raise",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Goblet Squat (Kettlebell)",body_part:"Legs",equipment:"Kettlebell",type:"weighted"},
+  {name:"Hack Squat",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Hack Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Hip Adductor (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Jump Squat",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Lateral Box Jump",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Leg Extension (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Lunge (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Lunge (Bodyweight)",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Lunge (Dumbbell)",body_part:"Legs",equipment:"Dumbbell",type:"weighted"},
+  {name:"Lying Leg Curl (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Overhead Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Pistol Squat",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Seated Calf Raise (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Seated Calf Raise (Plate Loaded)",body_part:"Legs",equipment:"Plate",type:"weighted"},
+  {name:"Seated Leg Curl (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Seated Leg Press (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Squat (Band)",body_part:"Legs",equipment:"Band",type:"weighted"},
+  {name:"Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Squat (Bodyweight)",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Squat (Dumbbell)",body_part:"Legs",equipment:"Dumbbell",type:"weighted"},
+  {name:"Squat (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Squat (Smith Machine)",body_part:"Legs",equipment:"Smith Machine",type:"weighted"},
+  {name:"Standing Calf Raise (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Standing Calf Raise (Bodyweight)",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Standing Calf Raise (Dumbbell)",body_part:"Legs",equipment:"Dumbbell",type:"weighted"},
+  {name:"Standing Calf Raise (Machine)",body_part:"Legs",equipment:"Machine",type:"weighted"},
+  {name:"Standing Calf Raise (Smith Machine)",body_part:"Legs",equipment:"Smith Machine",type:"weighted"},
+  {name:"Step-up",body_part:"Legs",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Zercher Squat (Barbell)",body_part:"Legs",equipment:"Barbell",type:"weighted"},
+  {name:"Cable Kickback",body_part:"Glutes",equipment:"Cable",type:"weighted"},
+  {name:"Cable Pull Through",body_part:"Glutes",equipment:"Cable",type:"weighted"},
+  {name:"Glute Kickback (Machine)",body_part:"Glutes",equipment:"Machine",type:"weighted"},
+  {name:"Hip Abductor (Machine)",body_part:"Glutes",equipment:"Machine",type:"weighted"},
+  {name:"Hip Thrust (Barbell)",body_part:"Glutes",equipment:"Barbell",type:"weighted"},
+  {name:"Hip Thrust (Bodyweight)",body_part:"Glutes",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Single Leg Bridge",body_part:"Glutes",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Ball Slams",body_part:"Full Body",equipment:"Other",type:"weighted"},
+  {name:"Battle Ropes",body_part:"Full Body",equipment:"Other",type:"duration"},
+  {name:"Burpee",body_part:"Full Body",equipment:"Bodyweight",type:"bodyweight"},
+  {name:"Deadlift High Pull (Barbell)",body_part:"Full Body",equipment:"Barbell",type:"weighted"},
+  {name:"Farmer's Carry",body_part:"Full Body",equipment:"Dumbbell",type:"weighted"},
+  {name:"Jump Shrug (Barbell)",body_part:"Full Body",equipment:"Barbell",type:"weighted"},
+  {name:"Kettlebell Swing",body_part:"Full Body",equipment:"Kettlebell",type:"weighted"},
+  {name:"Kettlebell Turkish Get Up",body_part:"Full Body",equipment:"Kettlebell",type:"weighted"},
+  {name:"Squat Row (Band)",body_part:"Full Body",equipment:"Band",type:"weighted"},
+  {name:"Sumo Deadlift High Pull (Barbell)",body_part:"Full Body",equipment:"Barbell",type:"weighted"},
+  {name:"Thruster (Barbell)",body_part:"Full Body",equipment:"Barbell",type:"weighted"},
+  {name:"Thruster (Kettlebell)",body_part:"Full Body",equipment:"Kettlebell",type:"weighted"},
+  {name:"Clean (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Clean and Jerk (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Hang Clean (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Hang Snatch (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Power Clean",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Power Snatch (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Press Under (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Snatch (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Snatch Pull (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Split Jerk (Barbell)",body_part:"Olympic",equipment:"Barbell",type:"weighted"},
+  {name:"Aerobics",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Climbing",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Cycling",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Cycling (Indoor)",body_part:"Cardio",equipment:"Machine",type:"cardio"},
+  {name:"Elliptical Machine",body_part:"Cardio",equipment:"Machine",type:"cardio"},
+  {name:"High Knee Skips",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Hiking",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Jump Rope",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Jumping Jack",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Rowing (Machine)",body_part:"Cardio",equipment:"Machine",type:"cardio"},
+  {name:"Running",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Running (Treadmill)",body_part:"Cardio",equipment:"Machine",type:"cardio"},
+  {name:"Skating",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Skiing",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Snowboarding",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Swimming",body_part:"Cardio",equipment:"Other",type:"cardio"},
+  {name:"Walking",body_part:"Cardio",equipment:"Bodyweight",type:"cardio"},
+  {name:"Stretching",body_part:"Other",equipment:"Bodyweight",type:"duration"},
+  {name:"Yoga",body_part:"Other",equipment:"Bodyweight",type:"duration"}
+];
 
 // ─── Supabase Init ────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://jbsyenvrbzubyjckggju.supabase.co';
@@ -388,10 +584,10 @@ async function handleLogout(){
 async function loadSetsCloud(){
   const{data,error}=await _sb.from('sets').select('*').eq('user_id',_currentUser.id);
   if(error){console.error('loadSets',error);return[];}
-  return(data||[]).map(r=>({id:r.id,date:r.date,ex:r.exercise,w:r.weight,r:r.reps,note:r.note||''}));
+  return(data||[]).map(r=>({id:r.id,date:r.date,ex:r.exercise,w:r.weight,r:r.reps,note:r.note||'',distance:r.distance||null,duration_hours:r.duration_hours||null,duration_minutes:r.duration_minutes||null,duration_seconds:r.duration_seconds||null,pace:r.pace||null}));
 }
 async function saveSetCloud(s){
-  await _sb.from('sets').upsert({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:s.note||null},{onConflict:'id'});
+  await _sb.from('sets').upsert({id:s.id,user_id:_currentUser.id,exercise:s.ex,weight:s.w||null,reps:s.r||null,date:s.date,note:s.note||null,distance:s.distance||null,duration_hours:s.duration_hours||null,duration_minutes:s.duration_minutes||null,duration_seconds:s.duration_seconds||null,pace:s.pace||null},{onConflict:'id'});
 }
 async function deleteSetCloud(id){
   await _sb.from('sets').delete().eq('id',id).eq('user_id',_currentUser.id);
@@ -400,15 +596,14 @@ async function deleteSetCloud(id){
 async function loadExercisesCloud(){
   const{data,error}=await _sb.from('exercises').select('*').eq('user_id',_currentUser.id);
   if(error||!data||data.length===0)return null;
-  return data.map(r=>({id:r.id,name:r.name,cat:r.cat}));
+  return data.map(r=>({id:r.id,name:r.name,body_part:r.body_part||r.cat||'Other',equipment:r.equipment||'Other',type:r.type||'weighted'}));
 }
 async function saveExercisesCloud(exList){
-  // Upsert all exercises for this user
-  const rows=exList.map(e=>({id:e.id||genId(),user_id:_currentUser.id,name:e.name,cat:e.cat||'Other'}));
+  const rows=exList.map(e=>({id:e.id||genId(),user_id:_currentUser.id,name:e.name,cat:e.body_part||e.cat||'Other',body_part:e.body_part||e.cat||'Other',equipment:e.equipment||'Other',type:e.type||'weighted'}));
   await _sb.from('exercises').upsert(rows,{onConflict:'id'});
 }
 async function saveOneExerciseCloud(ex){
-  const row={id:ex.id||genId(),user_id:_currentUser.id,name:ex.name,cat:ex.cat||'Other'};
+  const row={id:ex.id||genId(),user_id:_currentUser.id,name:ex.name,cat:ex.body_part||ex.cat||'Other',body_part:ex.body_part||ex.cat||'Other',equipment:ex.equipment||'Other',type:ex.type||'weighted'};
   await _sb.from('exercises').upsert(row,{onConflict:'id'});
 }
 
@@ -532,6 +727,8 @@ function getSessionVol(date){return Math.round(sets.filter(s=>s.date===date).red
 function getSessions(){return[...new Set(sets.map(s=>s.date))].sort((a,b)=>b.localeCompare(a));}
 function getExNames(){return exercises.map(e=>e.name).sort();}
 function getExCat(name){return(exercises.find(e=>e.name===name)||{}).cat||'';}
+function getExType(name){return(exercises.find(e=>e.name===name)||{}).type||"weighted";}
+function getExEquipment(name){return(exercises.find(e=>e.name===name)||{}).equipment||"";}
 function getWeightProgress(ex){const byDate={};sets.filter(s=>s.ex===ex&&s.w).forEach(s=>{if(!byDate[s.date]||s.w>byDate[s.date])byDate[s.date]=s.w;});return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),maxW:byDate[d]}));}
 function getExData(ex){const byDate={};sets.filter(s=>s.ex===ex).forEach(s=>{if(!byDate[s.date])byDate[s.date]=[];byDate[s.date].push(s);});return Object.keys(byDate).sort().map(d=>({date:d,label:fmtDateShort(d),maxW:Math.max(...byDate[d].filter(s=>s.w).map(s=>s.w),0)||null,vol:Math.round(byDate[d].filter(s=>s.w&&s.r).reduce((t,s)=>t+s.w*s.r,0)),sets:byDate[d]}));}
 function dupKey(s){return`${s.date}|${s.ex}|${s.w}|${s.r}`;}
@@ -638,7 +835,7 @@ function renderCalendar(){
       <button class="btn-cta" onclick="renderSessionEdit('${calSelected}','calendar')">Edit This Workout</button>
     </div>
     <div style="padding:0 16px;" class="fade-in">
-      ${selExs.map(ex=>{const exSets=selSets.filter(s=>s.ex===ex);return`<div class="detail-ex-name" style="padding:10px 0 6px;">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></div>${exSets.map((s,i)=>`<div class="detail-set-row"><span class="detail-set-num">Set ${i+1}</span><span class="detail-set-info">${s.w?s.w+'kg × '+s.r+' reps':s.r+' reps'}</span><span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span></div>`).join('')}`;}).join('')}
+      ${selExs.map(ex=>{const exSets=selSets.filter(s=>s.ex===ex);return`<div class="detail-ex-name" style="padding:10px 0 6px;">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></div>${exSets.map((s,i)=>`<div class="detail-set-row"><span class="detail-set-num">Set ${i+1}</span><span class="detail-set-info">${fmtSetDisplay(s)}</span><span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span></div>`).join('')}`;}).join('')}
     </div>`}`;
 }
 function selectCalDay(date){calSelected=date;renderCalendar();}
@@ -685,22 +882,80 @@ function buildExBlock(ex,date,maxWtByEx){
   const exSets=sets.filter(s=>s.date===date&&s.ex===ex);
   const globalMax=maxWtByEx[ex]||0;
   const safeKey=ex.replace(/[^a-z0-9]/gi,'_');
+  const exType=getExType(ex);
   return`<div class="detail-ex-block">
-    <div class="detail-ex-header"><span class="detail-ex-name">${ex} <span style="color:var(--text3);font-size:10px;">${getExCat(ex)}</span></span></div>
+    <div class="detail-ex-header">
+      <span class="detail-ex-name">${ex}</span>
+      <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;">
+        ${getExCat(ex)?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--blue-dim);color:var(--blue);">${getExCat(ex)}</span>`:''}
+        ${getExEquipment(ex)?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--amber-dim);color:var(--amber);">${getExEquipment(ex)}</span>`:''}
+      </div>
+    </div>
     ${exSets.map((s,i)=>`<div class="detail-set-row" id="setrow-${s.id}">
       <span class="detail-set-num">Set ${i+1}</span>
-      <span class="detail-set-info">${s.w?s.w+'kg × '+s.r+' reps':s.r+' reps'}</span>
+      <span class="detail-set-info">${fmtSetDisplay(s)}</span>
       <span class="detail-set-1rm">${calc1RM(s.w,s.r)?calc1RM(s.w,s.r)+'kg':''}</span>
       ${s.w&&s.w===globalMax?'<span class="tag-badge tag-wt">PR</span>':''}
-      <button class="icon-btn edit-btn" onclick="startEditSet('${s.id}')">✎</button>
       <button class="icon-btn del-btn" onclick="deleteSetById('${s.id}')">✕</button>
     </div>`).join('')}
+    ${exType==='cardio'?`
+    <div style="display:flex;flex-direction:column;gap:6px;padding:8px 0;">
+      <div style="display:flex;gap:6px;">
+        <input type="number" placeholder="km" step="0.01" min="0" inputmode="decimal" id="addDist-${safeKey}" style="flex:1;padding:8px 10px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+        <input type="number" placeholder="hr" step="1" min="0" inputmode="numeric" id="addHr-${safeKey}" style="width:52px;padding:8px 6px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;">
+        <input type="number" placeholder="min" step="1" min="0" inputmode="numeric" id="addMin-${safeKey}" style="width:52px;padding:8px 6px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;">
+        <input type="number" placeholder="sec" step="1" min="0" inputmode="numeric" id="addSec-${safeKey}" style="width:52px;padding:8px 6px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;text-align:center;">
+        <button class="save-btn" onclick="addCardioToSession('${ex}','${safeKey}')">+ Add</button>
+      </div>
+    </div>`
+    :exType==='duration'?`
+    <div class="add-set-bar">
+      <input type="number" placeholder="minutes" step="1" min="1" inputmode="numeric" id="addDur-${safeKey}">
+      <button class="save-btn" onclick="addDurationToSession('${ex}','${safeKey}')">+ Add</button>
+    </div>`
+    :exType==='bodyweight'?`
+    <div class="add-set-bar">
+      <input type="number" placeholder="reps" step="1" min="1" inputmode="numeric" id="addR-${safeKey}">
+      <input type="number" placeholder="sec" step="1" min="0" inputmode="numeric" id="addT-${safeKey}">
+      <button class="save-btn" onclick="addBodyweightToSession('${ex}','${safeKey}')">+ Set</button>
+    </div>`
+    :`
     <div class="add-set-bar">
       <input type="number" placeholder="kg" step="0.5" min="0" inputmode="decimal" id="addW-${safeKey}">
       <input type="number" placeholder="reps" step="1" min="1" inputmode="numeric" id="addR-${safeKey}">
       <button class="save-btn" onclick="addSetToSession('${ex}','${safeKey}')">+ Set</button>
-    </div>
+    </div>`}
   </div>`;
+}
+
+function addCardioToSession(ex,safeKey){
+  const dist=parseFloat(document.getElementById('addDist-'+safeKey)?.value)||null;
+  const hr=parseInt(document.getElementById('addHr-'+safeKey)?.value)||0;
+  const min=parseInt(document.getElementById('addMin-'+safeKey)?.value)||0;
+  const sec=parseInt(document.getElementById('addSec-'+safeKey)?.value)||0;
+  if(!dist&&!hr&&!min&&!sec){toast('Enter distance or duration','#ef4444');return;}
+  let pace=null;
+  if(dist&&(hr||min||sec)){const totalMin=hr*60+min+sec/60;pace=totalMin/dist;}
+  const s={id:genId(),date:_editCtx.date,ex,distance:dist,duration_hours:hr||null,duration_minutes:min||null,duration_seconds:sec||null,pace,w:null,r:null};
+  sets.push(s);saveSetCloud(s);toast('Cardio logged');
+  renderSessionEdit(_editCtx.date,_editCtx.fromPage);
+}
+
+function addDurationToSession(ex,safeKey){
+  const dur=parseInt(document.getElementById('addDur-'+safeKey)?.value)||null;
+  if(!dur){toast('Enter duration','#ef4444');return;}
+  const s={id:genId(),date:_editCtx.date,ex,duration_minutes:dur,w:null,r:null};
+  sets.push(s);saveSetCloud(s);toast(`${dur} min logged`);
+  renderSessionEdit(_editCtx.date,_editCtx.fromPage);
+}
+
+function addBodyweightToSession(ex,safeKey){
+  const r=parseInt(document.getElementById('addR-'+safeKey)?.value)||null;
+  const t=parseInt(document.getElementById('addT-'+safeKey)?.value)||null;
+  if(!r&&!t){toast('Enter reps or time','#ef4444');return;}
+  const s={id:genId(),date:_editCtx.date,ex,r,duration_seconds:t,w:null};
+  sets.push(s);saveSetCloud(s);toast('Set logged');
+  renderSessionEdit(_editCtx.date,_editCtx.fromPage);
 }
 
 function startEditSet(id){
@@ -745,41 +1000,145 @@ function addExToSession(){
 
 // ─── Log ──────────────────────────────────────────────────────────────────────
 let todaySets=[],logDate=todayStr();
+
+function getLogInputs(exType){
+  if(exType==='cardio'){
+    return`<div class="form-field"><label class="form-label">Distance (km)</label><input type="number" id="logDist" placeholder="5.0" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="form-field"><label class="form-label">Duration</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div><label class="form-label" style="font-size:10px;">Hours</label><input type="number" id="logHr" placeholder="0" min="0" step="1" inputmode="numeric" style="width:100%;padding:11px 10px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"></div>
+        <div><label class="form-label" style="font-size:10px;">Minutes</label><input type="number" id="logMin" placeholder="30" min="0" max="59" step="1" inputmode="numeric" style="width:100%;padding:11px 10px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" oninput="calcPacePreview()"></div>
+        <div><label class="form-label" style="font-size:10px;">Seconds</label><input type="number" id="logSec" placeholder="0" min="0" max="59" step="1" inputmode="numeric" style="width:100%;padding:11px 10px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" oninput="calcPacePreview()"></div>
+      </div>
+    </div>
+    <div id="pacePreview" style="font-size:13px;color:var(--green);font-weight:600;padding:8px 14px;background:var(--green-dim);border-radius:var(--radius-sm);margin-bottom:14px;display:none;"></div>`;
+  } else if(exType==='duration'){
+    return`<div class="form-field"><label class="form-label">Duration (minutes)</label><input type="number" id="logDur" placeholder="30" min="1" step="1" inputmode="numeric"></div>`;
+  } else if(exType==='bodyweight'){
+    return`<div class="set-inputs">
+      <div class="form-field"><label class="form-label">Reps</label><input type="number" id="logReps" placeholder="10" min="1" step="1" inputmode="numeric"></div>
+      <div class="form-field"><label class="form-label">Time (sec) optional</label><input type="number" id="logTime" placeholder="60" min="0" step="1" inputmode="numeric"></div>
+    </div>`;
+  } else {
+    return`<div class="set-inputs">
+      <div class="form-field"><label class="form-label">Weight (kg)</label><input type="number" id="logWeight" placeholder="0" min="0" step="0.5" inputmode="decimal"></div>
+      <div class="form-field"><label class="form-label">Reps</label><input type="number" id="logReps" placeholder="0" min="1" step="1" inputmode="numeric"></div>
+    </div>`;
+  }
+}
+
+function calcPacePreview(){
+  const dist=parseFloat(document.getElementById('logDist')?.value)||0;
+  const hr=parseInt(document.getElementById('logHr')?.value)||0;
+  const min=parseInt(document.getElementById('logMin')?.value)||0;
+  const sec=parseInt(document.getElementById('logSec')?.value)||0;
+  const preview=document.getElementById('pacePreview');
+  if(!preview)return;
+  if(dist>0&&(hr||min||sec)){
+    const totalMin=hr*60+min+sec/60;
+    const paceMin=totalMin/dist;
+    const paceM=Math.floor(paceMin);
+    const paceS=Math.round((paceMin-paceM)*60);
+    preview.textContent=`⚡ Pace: ${paceM}:${String(paceS).padStart(2,'0')} /km`;
+    preview.style.display='block';
+  } else {
+    preview.style.display='none';
+  }
+}
+
+function fmtSetDisplay(s){
+  const exType=getExType(s.ex);
+  if(exType==='cardio'){
+    const hr=s.duration_hours||0;
+    const min=s.duration_minutes||0;
+    const sec=s.duration_seconds||0;
+    const timeStr=hr?`${hr}h ${min}m ${sec}s`:`${min}m ${sec}s`;
+    const paceStr=s.pace?` · ${Math.floor(s.pace)}:${String(Math.round((s.pace%1)*60)).padStart(2,'0')} /km`:'';
+    return`${s.distance||'?'}km · ${timeStr}${paceStr}`;
+  } else if(exType==='duration'){
+    return`${s.duration_minutes||0} min`;
+  } else if(exType==='bodyweight'){
+    return s.duration_seconds?`${s.r||0} reps · ${s.duration_seconds}s`:s.r?`${s.r} reps`:'—';
+  } else {
+    return s.w?`${s.w}kg × ${s.r} reps`:s.r?`${s.r} reps`:'—';
+  }
+}
+
 function renderLog(dateOverride){
   if(dateOverride)logDate=dateOverride;
   const isToday=logDate===todayStr();
   const exNames=getExNames();
   const selEl=document.getElementById('logEx');
   const selEx=selEl?selEl.value:exNames[0];
+  const exType=getExType(selEx);
   const vol=Math.round(todaySets.reduce((t,s)=>t+(s.w&&s.r?s.w*s.r:0),0));
   const prevSets=sets.filter(s=>s.ex===selEx&&s.w).sort((a,b)=>b.date.localeCompare(a.date));
   const prevDate=prevSets.length?prevSets[0].date:null;
   const prevMax=prevDate?Math.max(...sets.filter(s=>s.ex===selEx&&s.date===prevDate&&s.w).map(s=>s.w)):null;
+
+  // Type badge
+  const typeBadge={weighted:'🏋️ Weighted',cardio:'🏃 Cardio',bodyweight:'💪 Bodyweight',duration:'⏱️ Duration'}[exType]||'';
+  const bodyPart=getExCat(selEx);
+  const equipment=getExEquipment(selEx);
+
   document.getElementById('screen').innerHTML=`
     <div class="page-header fade-in"><h1>Log Workout</h1><p>${isToday?'Today':fmtDate(logDate)}</p></div>
     ${!isToday?`<div class="date-badge fade-in">📅 Logging for ${fmtDate(logDate)}</div>`:''}
     <div class="log-wrap fade-in">
-      ${todaySets.length>0?`<div class="session-banner"><div class="session-banner-title">Session in progress</div><div class="session-banner-sub">${todaySets.length} sets · ${vol.toLocaleString()} kg</div></div>`:''}
+      ${todaySets.length>0?`<div class="session-banner"><div class="session-banner-title">Session in progress</div><div class="session-banner-sub">${todaySets.length} sets · ${vol?vol.toLocaleString()+' kg':todaySets.length+' logged'}</div></div>`:''}
       <div class="form-field"><label class="form-label">Exercise</label><select id="logEx" onchange="renderLog('${logDate}')">${exNames.map(e=>`<option value="${e}" ${e===selEx?'selected':''}>${e}</option>`).join('')}</select></div>
-      ${prevMax?`<div class="prev-hint">Last session: <span>${prevMax}kg</span> on ${fmtDateShort(prevDate)}</div>`:''}
-      <div class="set-inputs">
-        <div class="form-field"><label class="form-label">Weight (kg)</label><input type="number" id="logWeight" placeholder="0" min="0" step="0.5" inputmode="decimal"></div>
-        <div class="form-field"><label class="form-label">Reps</label><input type="number" id="logReps" placeholder="0" min="1" step="1" inputmode="numeric"></div>
-      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:12px;padding:4px 10px;background:var(--green-dim);border-radius:99px;display:inline-block;">${typeBadge}</div>
+      ${bodyPart||equipment?`<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+        ${bodyPart?`<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--blue-dim);color:var(--blue);">${bodyPart}</span>`:''}
+        ${equipment?`<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--amber-dim);color:var(--amber);">${equipment}</span>`:''}
+      </div>`:''}
+      ${prevMax&&exType==='weighted'?`<div class="prev-hint">Last session: <span>${prevMax}kg</span> on ${fmtDateShort(prevDate)}</div>`:''}
+      ${getLogInputs(exType)}
       <button class="btn-primary" onclick="addSet()">Add Set</button>
       <button class="btn-secondary" onclick="showAddExerciseModal()">+ Add New Exercise</button>
       ${todaySets.length>0?`<button class="btn-danger" onclick="finishWorkout()">Finish & Save Workout</button>`:''}
     </div>
-    ${todaySets.length>0?`<div class="section-label">This Session</div><div style="padding:0 16px;">${todaySets.slice().reverse().map((s,ri)=>{const i=todaySets.length-1-ri;const rm=calc1RM(s.w,s.r);return`<div class="logged-set fade-in"><div><div class="logged-set-info">Set ${i+1} · ${s.w?s.w+'kg × '+s.r+'reps':s.r+' reps'}</div><div class="logged-set-ex">${s.ex}</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="logged-set-1rm">${rm?rm+'kg 1RM':''}</span><button style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;font-size:18px;" onclick="removeLogSet(${i})">×</button></div></div>`;}).join('')}</div>`:`<div class="empty fade-in" style="margin-top:10px;"><div class="empty-icon">💪</div><p>Pick an exercise and start logging</p></div>`}`;
+    ${todaySets.length>0?`<div class="section-label">This Session</div><div style="padding:0 16px;">${todaySets.slice().reverse().map((s,ri)=>{const i=todaySets.length-1-ri;const rm=calc1RM(s.w,s.r);return`<div class="logged-set fade-in"><div><div class="logged-set-info">Set ${i+1} · ${fmtSetDisplay(s)}</div><div class="logged-set-ex">${s.ex}</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="logged-set-1rm">${rm?rm+'kg 1RM':''}</span><button style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;font-size:18px;" onclick="removeLogSet(${i})">×</button></div></div>`;}).join('')}</div>`:`<div class="empty fade-in" style="margin-top:10px;"><div class="empty-icon">💪</div><p>Pick an exercise and start logging</p></div>`}`;
 }
 
 function addSet(){
   const ex=document.getElementById('logEx').value;
-  const w=parseFloat(document.getElementById('logWeight').value)||null;
-  const r=parseInt(document.getElementById('logReps').value)||null;
-  if(!r){toast('Enter reps to add set','#ef4444');return;}
-  todaySets.push({id:genId(),ex,w,r});
-  const rm=calc1RM(w,r);toast(rm?`Set added · ${rm}kg 1RM`:'Set added');
+  const exType=getExType(ex);
+  let s={id:genId(),ex};
+
+  if(exType==='cardio'){
+    const dist=parseFloat(document.getElementById('logDist')?.value)||null;
+    const hr=parseInt(document.getElementById('logHr')?.value)||0;
+    const min=parseInt(document.getElementById('logMin')?.value)||0;
+    const sec=parseInt(document.getElementById('logSec')?.value)||0;
+    if(!dist&&!hr&&!min&&!sec){toast('Enter distance or duration','#ef4444');return;}
+    let pace=null;
+    if(dist&&(hr||min||sec)){
+      const totalMin=hr*60+min+sec/60;
+      pace=totalMin/dist;
+    }
+    s={...s,distance:dist,duration_hours:hr||null,duration_minutes:min||null,duration_seconds:sec||null,pace,w:null,r:null};
+    toast(`Cardio logged${pace?` · ${Math.floor(pace)}:${String(Math.round((pace%1)*60)).padStart(2,'0')} /km`:''}` );
+  } else if(exType==='duration'){
+    const dur=parseInt(document.getElementById('logDur')?.value)||null;
+    if(!dur){toast('Enter duration in minutes','#ef4444');return;}
+    s={...s,duration_minutes:dur,w:null,r:null};
+    toast(`${dur} min logged`);
+  } else if(exType==='bodyweight'){
+    const r=parseInt(document.getElementById('logReps')?.value)||null;
+    const time=parseInt(document.getElementById('logTime')?.value)||null;
+    if(!r&&!time){toast('Enter reps or time','#ef4444');return;}
+    s={...s,r,duration_seconds:time,w:null};
+    toast(r?`${r} reps logged`:`${time}s logged`);
+  } else {
+    const w=parseFloat(document.getElementById('logWeight')?.value)||null;
+    const r=parseInt(document.getElementById('logReps')?.value)||null;
+    if(!r){toast('Enter reps to add set','#ef4444');return;}
+    s={...s,w,r};
+    const rm=calc1RM(w,r);
+    toast(rm?`Set added · ${rm}kg 1RM`:'Set added');
+  }
+  todaySets.push(s);
   renderLog(logDate);
 }
 function removeLogSet(i){todaySets.splice(i,1);renderLog(logDate);}
@@ -795,27 +1154,55 @@ function finishWorkout(){
 }
 
 // ─── Add Exercise Modal ───────────────────────────────────────────────────────
-let selectedCat=null;
+let selectedBodyPart=null,selectedEquipment=null,selectedType='weighted';
 function showAddExerciseModal(){
-  selectedCat=null;
+  selectedBodyPart=null;selectedEquipment=null;selectedType='weighted';
   const overlay=document.createElement('div');overlay.className='modal-overlay';overlay.id='addExModal';
   overlay.innerHTML=`<div class="modal" style="max-width:480px;width:100%;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2 style="margin:0;">New Exercise</h2><button class="modal-close" onclick="closeModal('addExModal')">×</button></div>
-    <div class="form-field"><label class="form-label">Exercise Name</label><input type="text" id="newExName" placeholder="e.g. Farmer's Carry" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" autofocus></div>
-    <label class="form-label" style="display:block;margin-bottom:10px;">Category</label>
-    <div class="cat-grid">${CATEGORIES.map(c=>`<button class="cat-btn" onclick="selectCat('${c}',this)">${c}</button>`).join('')}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 style="margin:0;">New Exercise</h2>
+      <button class="modal-close" onclick="closeModal('addExModal')">×</button>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Exercise Name</label>
+      <input type="text" id="newExName" placeholder="e.g. Incline Dumbbell Press" style="width:100%;padding:13px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;" autofocus>
+    </div>
+
+    <label class="form-label" style="display:block;margin-bottom:10px;">Equipment</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
+      ${EQUIPMENT_TYPES.map(eq=>`<button class="cat-btn" onclick="selectEquipment('${eq}',this)" style="text-align:left;padding:10px 12px;">${eq}</button>`).join('')}
+    </div>
+
+    <label class="form-label" style="display:block;margin-bottom:10px;">Body Part</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
+      ${BODY_PARTS.map(bp=>`<button class="cat-btn" onclick="selectBodyPart('${bp}',this)" style="text-align:left;padding:10px 12px;">${bp}</button>`).join('')}
+    </div>
+
+    <label class="form-label" style="display:block;margin-bottom:10px;">Type</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
+      <button class="cat-btn selected" id="type-weighted" onclick="selectType('weighted',this)">🏋️ Weighted</button>
+      <button class="cat-btn" id="type-bodyweight" onclick="selectType('bodyweight',this)">💪 Bodyweight</button>
+      <button class="cat-btn" id="type-cardio" onclick="selectType('cardio',this)">🏃 Cardio</button>
+      <button class="cat-btn" id="type-duration" onclick="selectType('duration',this)">⏱️ Duration</button>
+    </div>
     <button class="btn-primary" onclick="saveNewExercise()">Add Exercise</button>
   </div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal('addExModal');});
 }
+function selectEquipment(eq,btn){selectedEquipment=eq;overlay_querySelectorAll=document.getElementById('addExModal');document.getElementById('addExModal').querySelectorAll('.cat-btn[onclick*="selectEquipment"]').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+function selectBodyPart(bp,btn){selectedBodyPart=bp;document.getElementById('addExModal').querySelectorAll('.cat-btn[onclick*="selectBodyPart"]').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+function selectType(type,btn){selectedType=type;document.querySelectorAll('[id^="type-"]').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+let selectedCat=null;
+function selectCat(cat,btn){selectedCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
 function selectCat(cat,btn){selectedCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
 function saveNewExercise(){
   const name=(document.getElementById('newExName').value||'').trim();
   if(!name){toast('Enter exercise name','#ef4444');return;}
-  if(!selectedCat){toast('Select a category','#ef4444');return;}
+  if(!selectedEquipment){toast('Select equipment','#ef4444');return;}
+  if(!selectedBodyPart){toast('Select body part','#ef4444');return;}
   if(exercises.find(e=>e.name.toLowerCase()===name.toLowerCase())){toast('Exercise already exists','#ef4444');return;}
-  const newEx={id:genId(),name,cat:selectedCat};
+  const newEx={id:genId(),name,body_part:selectedBodyPart,equipment:selectedEquipment,type:selectedType||'weighted'};
   exercises.push(newEx);saveOneExerciseCloud(newEx);closeModal('addExModal');
   toast(`"${name}" added!`);
   if(currentPage==='log')renderLog(logDate);
