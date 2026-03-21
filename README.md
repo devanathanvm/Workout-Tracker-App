@@ -3,7 +3,7 @@
 A production-ready fitness tracking app built as a single-file Progressive Web App
 and packaged as an Android APK. No frameworks. No build step. Just HTML, CSS, and JS.
 
-🌐 **Live App:** [your-app.vercel.app](https://workout-tracker-app-lemon.vercel.app/)
+🌐 **Live App:** [your-app-here](https://workout-tracker-app-lemon.vercel.app/)
 
 ---
 
